@@ -1,138 +1,173 @@
 import { db } from '../lib/firebase.js'
-import { collection, addDoc, getDocs, getDoc, doc, updateDoc, deleteDoc, query, orderBy, setDoc } from 'firebase/firestore'
+import {
+  collection,
+  addDoc,
+  getDocs,
+  updateDoc,
+  deleteDoc,
+  doc,
+  query,
+  where
+} from 'firebase/firestore'
 
-export async function crearTarea(nombreProyecto, tarea) {
-  if (!tarea.titulo) {
-    console.error('Error: titulo requerido')
-    return null
-  }
+// OBTENER TAREAS DE UN ÁREA
+export async function obtenerTareasPorArea(areaId) {
+  try {
+    if (!areaId) {
+      console.error('Error: areaId requerido')
+      return []
+    }
 
-  if (!nombreProyecto) {
-    console.error('Error: nombreProyecto requerido')
-    return null
-  }
-
-  const data = {
-    titulo: tarea.titulo,
-    descripcion: tarea.descripcion || '',
-    estado: tarea.estado || 'todo',
-    prioridad: tarea.prioridad || 'medium',
-    dueDate: tarea.dueDate || null,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString()
-  }
-
-  const tareasColRef = collection(db, 'proyectos', nombreProyecto, 'tareas')
-  const docRef = await addDoc(tareasColRef, data)
-  console.log('Tarea creada:', docRef.id)
-  return docRef.id
-}
-
-export async function obtenerTareas(nombreProyecto) {
-  if (!nombreProyecto) {
-    console.error('Error: nombreProyecto requerido')
+    // NOTA: Sin orderBy para evitar requerir índice compuesto
+    // Ordenamos en cliente después
+    const q = query(
+      collection(db, 'tareas'),
+      where('areaId', '==', areaId)
+    )
+    const snapshot = await getDocs(q)
+    const tareas = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }))
+    
+    // Ordenar en cliente por createdAt descendente
+    return tareas.sort((a, b) => 
+      new Date(b.createdAt) - new Date(a.createdAt)
+    )
+  } catch (error) {
+    console.error('Error obteniendo tareas por área:', error)
     return []
   }
-
-  const tareasColRef = collection(db, 'proyectos', nombreProyecto, 'tareas')
-  const q = query(tareasColRef, orderBy('createdAt', 'desc'))
-  const snapshot = await getDocs(q)
-  const tareas = []
-  
-  snapshot.forEach(doc => {
-    tareas.push({ id: doc.id, ...doc.data() })
-  })
-  console.log('Tareas obtenidas:', tareas.length)
-  return tareas
 }
 
-export async function obtenerConteoTareas(nombreProyecto) {
-  if (!nombreProyecto) return { todo: 0, in_progress: 0, in_review: 0, done: 0, vencidas: 0 }
-
-  const tareasColRef = collection(db, 'proyectos', nombreProyecto, 'tareas')
-  const snapshot = await getDocs(tareasColRef)
-  
-  const conteo = { todo: 0, in_progress: 0, in_review: 0, done: 0, vencidas: 0 }
-  const now = new Date()
-  
-  snapshot.forEach(doc => {
-    const data = doc.data()
-    const estado = data.estado || 'todo'
-    if (conteo.hasOwnProperty(estado)) {
-      conteo[estado]++
+// CREAR TAREA
+export async function crearTarea(areaId, tarea) {
+  try {
+    if (!areaId) {
+      console.error('Error: areaId requerido')
+      return null
     }
-    // Vencidas: tiene dueDate, no está completada, y la fecha ya pasó
-    if (data.dueDate && estado !== 'done') {
-      const dueDate = new Date(data.dueDate)
-      if (dueDate < now) {
-        conteo.vencidas++
-      }
+
+    if (!tarea.titulo) {
+      console.error('Error: titulo requerido')
+      return null
     }
-  })
-  return conteo
+
+    const { titulo, descripcion, prioridad, dueDate, estado } = tarea
+
+    const docRef = await addDoc(collection(db, 'tareas'), {
+      areaId,
+      titulo,
+      descripcion: descripcion || '',
+      prioridad: prioridad || 'medium',
+      estado: estado || 'todo',
+      dueDate: dueDate || null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    })
+
+    return {
+      id: docRef.id,
+      areaId,
+      titulo,
+      descripcion: descripcion || '',
+      prioridad: prioridad || 'medium',
+      estado: estado || 'todo',
+      dueDate: dueDate || null,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    }
+  } catch (error) {
+    console.error('Error creando tarea:', error)
+    throw error
+  }
 }
 
-export async function actualizarTarea(nombreProyecto, tareaId, tarea) {
-  if (!nombreProyecto || !tareaId) {
-    console.error('Error: nombreProyecto y tareaId requeridos')
-    return false
-  }
+// ACTUALIZAR TAREA
+export async function actualizarTarea(tareaId, updates) {
+  try {
+    if (!tareaId) {
+      console.error('Error: tareaId requerido')
+      return false
+    }
 
-  const docRef = doc(db, 'proyectos', nombreProyecto, 'tareas', tareaId)
-  const data = {
-    ...tarea,
-    updatedAt: new Date().toISOString()
-  }
+    const tareaRef = doc(db, 'tareas', tareaId)
+    await updateDoc(tareaRef, {
+      ...updates,
+      updatedAt: new Date().toISOString()
+    })
 
-  await updateDoc(docRef, data)
-  console.log('Tarea actualizada:', tareaId)
-  return true
+    return true
+  } catch (error) {
+    console.error('Error actualizando tarea:', error)
+    throw error
+  }
 }
 
-export async function eliminarTarea(nombreProyecto, tareaId) {
-  if (!nombreProyecto || !tareaId) {
-    console.error('Error: nombreProyecto y tareaId requeridos')
-    return false
-  }
+// ELIMINAR TAREA
+export async function eliminarTarea(tareaId) {
+  try {
+    if (!tareaId) {
+      console.error('Error: tareaId requerido')
+      return false
+    }
 
-  const docRef = doc(db, 'proyectos', nombreProyecto, 'tareas', tareaId)
-  await deleteDoc(docRef)
-  console.log('Tarea eliminada:', tareaId)
-  return true
+    const tareaRef = doc(db, 'tareas', tareaId)
+    await deleteDoc(tareaRef)
+
+    return true
+  } catch (error) {
+    console.error('Error eliminando tarea:', error)
+    throw error
+  }
 }
 
-export async function agregarComentario(nombreProyecto, tareaId, comentario) {
-  if (!nombreProyecto || !tareaId) {
-    console.error('Error: nombreProyecto y tareaId requeridos')
-    return false
-  }
+// ELIMINAR TODAS LAS TAREAS DE UN ÁREA
+export async function eliminarTareasPorArea(areaId) {
+  try {
+    if (!areaId) {
+      console.error('Error: areaId requerido')
+      return false
+    }
 
-  const comentariosColRef = collection(db, 'proyectos', nombreProyecto, 'tareas', tareaId, 'comentarios')
-  const data = {
-    texto: comentario.texto,
-    autor: comentario.autor || 'Usuario',
-    fecha: new Date().toISOString()
-  }
+    const tareas = await obtenerTareasPorArea(areaId)
 
-  await addDoc(comentariosColRef, data)
-  console.log('Comentario agregado')
-  return true
+    for (const tarea of tareas) {
+      await deleteDoc(doc(db, 'tareas', tarea.id))
+    }
+
+    return true
+  } catch (error) {
+    console.error('Error eliminando tareas por área:', error)
+    throw error
+  }
 }
 
-export async function agregarAdjunto(nombreProyecto, tareaId, adjunto) {
-  if (!nombreProyecto || !tareaId) {
-    console.error('Error: nombreProyecto y tareaId requeridos')
-    return false
+// OBTENER TODAS LAS TAREAS (para búsqueda global)
+export async function obtenerTodasLasTareas() {
+  try {
+    const snapshot = await getDocs(collection(db, 'tareas'))
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }))
+  } catch (error) {
+    console.error('Error obteniendo todas las tareas:', error)
+    return []
   }
+}
 
-  const adjuntosColRef = collection(db, 'proyectos', nombreProyecto, 'tareas', tareaId, 'adjuntos')
-  const data = {
-    url: adjunto.url,
-    nombre: adjunto.nombre || 'archivo',
-    fecha: new Date().toISOString()
+// BUSCAR TAREAS (búsqueda local)
+export async function buscarTareas(termino) {
+  try {
+    const todas = await obtenerTodasLasTareas()
+    return todas.filter(
+      tarea =>
+        tarea.titulo.toLowerCase().includes(termino.toLowerCase()) ||
+        tarea.descripcion?.toLowerCase().includes(termino.toLowerCase())
+    )
+  } catch (error) {
+    console.error('Error buscando tareas:', error)
+    return []
   }
-
-  await addDoc(adjuntosColRef, data)
-  console.log('Adjunto agregado')
-  return true
 }

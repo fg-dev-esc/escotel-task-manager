@@ -1,11 +1,11 @@
 import { RouterProvider } from 'react-router-dom'
 import { router } from './router'
-import { ProjectProvider } from './hooks/useProjects.jsx'
+import { AreasProvider } from './hooks/useAreas.jsx'
 
 export default function App() {
   return (
-    <ProjectProvider>
+    <AreasProvider>
       <RouterProvider router={router} />
-    </ProjectProvider>
+    </AreasProvider>
   )
 }

@@ -10,7 +10,7 @@ export default function TaskKanban({
   columnas, 
   onMoverTarea, 
   onTaskClick,
-  recargar 
+  onDeleteTask
 }) {
   const [tareasLocal, setTareasLocal] = useState(tareas)
   const { token } = theme.useToken()

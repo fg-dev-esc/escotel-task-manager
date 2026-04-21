@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Button, Typography, Segmented, Space } from 'antd'
 import { ArrowLeftOutlined, PlusOutlined, AppstoreOutlined, BarsOutlined } from '@ant-design/icons'
@@ -6,27 +6,31 @@ import TaskList from './components/TaskList'
 import TaskKanban from './components/TaskKanban'
 import TaskForm from './components/TaskForm'
 import { useTaskList } from './components/useTaskList'
-import { useTaskForm } from './components/useTaskForm'
-import { useProjects } from '../../hooks/useProjects.jsx'
-import { actualizarTarea } from '../../services/tasks'
+import { useAreas } from '../../hooks/useAreas.jsx'
 
 const { Title, Text } = Typography
 
 export default function Project() {
-  const { id: nombreProyecto } = useParams()
+  const { id: areaId } = useParams()
   const navigate = useNavigate()
-  const { projects } = useProjects()
-  const { tareas, recargar } = useTaskList(nombreProyecto)
-  const { handleSubmit } = useTaskForm(nombreProyecto)
-  
-  const [viewMode, setViewMode] = useState('lista')
+  const { areas } = useAreas()
+  const {
+    tareas,
+    stats,
+    cargarTareas,
+    crearTarea,
+    actualizarTarea,
+    eliminarTarea
+  } = useTaskList(areaId)
+
+  const [viewMode, setViewMode] = useState('kanban')
   const [showForm, setShowForm] = useState(false)
   const [editandoTarea, setEditandoTarea] = useState(null)
 
-  const proyecto = projects.find(p => p.id === nombreProyecto)
-  const nombreProyectoDisplay = proyecto ? proyecto.name : nombreProyecto
+  const area = areas.find(a => a.id === areaId)
+  const areaDisplay = area ? area.nombre : areaId
 
-  const handleEdit = (tarea) => {
+  const handleEdit = tarea => {
     setEditandoTarea(tarea)
     setShowForm(true)
   }
@@ -41,37 +45,62 @@ export default function Project() {
     setEditandoTarea(null)
   }
 
-  const handleSubmitForm = async (values) => {
-    if (editandoTarea) {
-      await handleSubmit(editandoTarea.id, values)
-    } else {
-      await handleSubmit(null, values)
+  const handleSubmitForm = async values => {
+    try {
+      if (editandoTarea) {
+        await actualizarTarea(editandoTarea.id, values)
+      } else {
+        await crearTarea(values)
+      }
+      handleClose()
+    } catch (error) {
+      console.error('Error guardando tarea:', error)
     }
-    recargar()
+  }
+
+  const handleMoverTarea = async (tareaId, nuevoEstado) => {
+    try {
+      await actualizarTarea(tareaId, { estado: nuevoEstado })
+    } catch (error) {
+      console.error('Error moviendo tarea:', error)
+    }
+  }
+
+  const handleEliminarTarea = async tareaId => {
+    try {
+      await eliminarTarea(tareaId)
+    } catch (error) {
+      console.error('Error eliminando tarea:', error)
+    }
   }
 
   return (
     <div style={{ padding: 24 }}>
       <header style={{ marginBottom: 24 }}>
-        <Button 
-          type="text" 
-          icon={<ArrowLeftOutlined />} 
+        <Button
+          type="text"
+          icon={<ArrowLeftOutlined />}
           onClick={() => navigate('/')}
           style={{ marginBottom: 16 }}
         />
         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
           <div>
-            <Title level={1} style={{ margin: 0 }}>{nombreProyectoDisplay}</Title>
-            <Text>{tareas.length} tareas</Text>
+            <Title level={1} style={{ margin: 0 }}>
+              {areaDisplay}
+            </Title>
+            <Text>
+              {stats.activas} activas • {stats.completadas} completadas
+              {stats.vencidas > 0 && ` • ${stats.vencidas} vencidas`}
+            </Text>
           </div>
           <Space>
-            <Segmented 
-              value={viewMode} 
+            <Segmented
+              value={viewMode}
               onChange={setViewMode}
               options={[
                 { value: 'lista', icon: <BarsOutlined /> },
-                { value: 'kanban', icon: <AppstoreOutlined /> },
-              ]} 
+                { value: 'kanban', icon: <AppstoreOutlined /> }
+              ]}
             />
             <Button type="primary" icon={<PlusOutlined />} onClick={handleNew}>
               Nueva Tarea
@@ -81,33 +110,30 @@ export default function Project() {
       </header>
 
       {viewMode === 'lista' ? (
-        <TaskList 
-          tareas={tareas} 
-          onEditTask={handleEdit} 
-          onRecargar={recargar} 
+        <TaskList
+          tareas={tareas}
+          onEditTask={handleEdit}
+          onDeleteTask={handleEliminarTarea}
         />
       ) : (
-         <TaskKanban 
-           tareas={tareas}
-           columnas={[
-             { id: 'todo', label: 'POR HACER' },
-             { id: 'in_progress', label: 'EN CURSO' },
-             { id: 'in_review', label: 'EN REVISION' },
-             { id: 'done', label: 'COMPLETADO' },
-           ]}
-           onMoverTarea={async (tareaId, estado) => {
-             await actualizarTarea(nombreProyecto, tareaId, { estado })
-             recargar()
-           }}
-           onTaskClick={handleEdit}
-           recargar={recargar}
-         />
+        <TaskKanban
+          tareas={tareas}
+          columnas={[
+            { id: 'todo', label: 'POR HACER' },
+            { id: 'in_progress', label: 'EN CURSO' },
+            { id: 'in_review', label: 'EN REVISION' },
+            { id: 'done', label: 'COMPLETADO' }
+          ]}
+          onMoverTarea={handleMoverTarea}
+          onTaskClick={handleEdit}
+          onDeleteTask={handleEliminarTarea}
+        />
       )}
 
-      <TaskForm 
-        visible={showForm} 
-        tarea={editandoTarea} 
-        onClose={handleClose} 
+      <TaskForm
+        visible={showForm}
+        tarea={editandoTarea}
+        onClose={handleClose}
         onSubmit={handleSubmitForm}
       />
     </div>

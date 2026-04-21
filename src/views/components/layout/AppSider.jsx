@@ -1,7 +1,7 @@
 import { Layout, Menu, theme } from 'antd'
-import { FolderOutlined, DashboardOutlined } from '@ant-design/icons'
+import { DashboardOutlined } from '@ant-design/icons'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { useProjects } from '../../../hooks/useProjects.jsx'
+import { useAreas } from '../../../hooks/useAreas.jsx'
 import { getIconComponent } from '../../../utils/icons'
 import logoEscotel from '../../../assets/logo.png'
 
@@ -10,12 +10,12 @@ const { Sider } = Layout
 export default function AppSider() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { projects } = useProjects()
+  const { areas } = useAreas()
   const { token } = theme.useToken()
 
   const menuItems = [
     {
-      key: 'projects',
+      key: 'dashboard',
       icon: <DashboardOutlined />,
       label: 'Dashboard',
       onClick: () => navigate('/'),
@@ -24,13 +24,13 @@ export default function AppSider() {
       type: 'divider',
       style: { margin: '16px 0', opacity: 0.5 },
     },
-    ...projects.map((project) => {
-      const IconComponent = getIconComponent(project.icon)
+    ...areas.map((area) => {
+      const IconComponent = getIconComponent(area.icon)
       return {
-        key: `/${project.id}`,
-        icon: <IconComponent style={{ color: project.color }} />,
-        label: project.name,
-        onClick: () => navigate(`/${project.id}`),
+        key: `/${area.id}`,
+        icon: <IconComponent style={{ color: area.color }} />,
+        label: area.nombre,
+        onClick: () => navigate(`/${area.id}`),
       }
     }),
   ]
