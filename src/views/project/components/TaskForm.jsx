@@ -11,7 +11,6 @@ export default function TaskForm({ visible, tarea, onClose, onSubmit }) {
         titulo: tarea.titulo,
         descripcion: tarea.descripcion,
         prioridad: tarea.prioridad,
-        estado: tarea.estado,
         dueDate: tarea.dueDate ? dayjs(tarea.dueDate) : null,
       })
     } else {
@@ -22,6 +21,7 @@ export default function TaskForm({ visible, tarea, onClose, onSubmit }) {
   const handleSubmit = async (values) => {
     const data = {
       ...values,
+      estado: 'todo',
       dueDate: values.dueDate ? values.dueDate.toISOString() : null,
     }
     await onSubmit(data)
@@ -56,14 +56,6 @@ export default function TaskForm({ visible, tarea, onClose, onSubmit }) {
             <Select.Option value="high">ALTA</Select.Option>
             <Select.Option value="medium">MEDIA</Select.Option>
             <Select.Option value="low">BAJA</Select.Option>
-          </Select>
-        </Form.Item>
-
-        <Form.Item label="ESTADO" name="estado" initialValue="todo">
-          <Select>
-            <Select.Option value="todo">POR HACER</Select.Option>
-            <Select.Option value="in_progress">EN CURSO</Select.Option>
-            <Select.Option value="done">COMPLETADO</Select.Option>
           </Select>
         </Form.Item>
       </Form>
