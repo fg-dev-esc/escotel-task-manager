@@ -5,6 +5,7 @@ import { ArrowLeftOutlined, PlusOutlined, AppstoreOutlined, BarsOutlined } from 
 import TaskList from './components/TaskList'
 import TaskKanban from './components/TaskKanban'
 import TaskForm from './components/TaskForm'
+import TaskFormDrawer from './components/TaskFormDrawer'
 import { useTaskList } from './components/useTaskList'
 import { useAreas } from '../../hooks/useAreas.jsx'
 
@@ -130,12 +131,25 @@ export default function Project() {
         />
       )}
 
-      <TaskForm
-        visible={showForm}
-        tarea={editandoTarea}
-        onClose={handleClose}
-        onSubmit={handleSubmitForm}
-      />
+      {/* Modal para CREAR */}
+      {!editandoTarea && (
+        <TaskForm
+          visible={showForm}
+          tarea={null}
+          onClose={handleClose}
+          onSubmit={handleSubmitForm}
+        />
+      )}
+
+      {/* Drawer para EDITAR */}
+      {editandoTarea && (
+        <TaskFormDrawer
+          open={showForm}
+          tarea={editandoTarea}
+          onClose={handleClose}
+          onSubmit={handleSubmitForm}
+        />
+      )}
     </div>
   )
 }

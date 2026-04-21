@@ -115,7 +115,7 @@ export default function Projects() {
           <Text>{areas.length} áreas</Text>
         </div>
         <Button type="primary" onClick={handleNuevo}>
-          Nueva Área
+          Nuevo Proyecto
         </Button>
       </header>
 
