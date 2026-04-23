@@ -1,9 +1,21 @@
 import { Drawer, Form, Input, Select, DatePicker, Button, Space } from 'antd'
 import { useEffect } from 'react'
 import dayjs from 'dayjs'
+import ComentariosSection from './ComentariosSection'
+import { useComentarios } from '../../../hooks/useComentarios'
 
 export default function TaskFormDrawer({ open, tarea, onClose, onSubmit }) {
   const [form] = Form.useForm()
+
+  // Hook para comentarios
+  const {
+    comentarios,
+    loading: loadingComentarios,
+    cargarComentarios,
+    agregarComentario,
+    actualizarComentario,
+    eliminarComentario
+  } = useComentarios(tarea?.id)
 
   useEffect(() => {
     if (tarea) {
@@ -15,6 +27,13 @@ export default function TaskFormDrawer({ open, tarea, onClose, onSubmit }) {
       })
     }
   }, [tarea, form])
+
+  // Cargar comentarios cuando se abre el drawer
+  useEffect(() => {
+    if (open && tarea?.id) {
+      cargarComentarios()
+    }
+  }, [open, tarea?.id, cargarComentarios])
 
   const handleSubmit = async (values) => {
     const data = {
@@ -63,7 +82,18 @@ export default function TaskFormDrawer({ open, tarea, onClose, onSubmit }) {
             <Select.Option value="low">BAJA</Select.Option>
           </Select>
         </Form.Item>
+
+        {/* SECCIÓN DE COMENTARIOS */}
+        <ComentariosSection
+          tareaId={tarea?.id}
+          comentarios={comentarios}
+          onAgregar={agregarComentario}
+          onActualizar={actualizarComentario}
+          onEliminar={eliminarComentario}
+          loading={loadingComentarios}
+        />
       </Form>
     </Drawer>
   )
 }
+
