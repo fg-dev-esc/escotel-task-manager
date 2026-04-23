@@ -46,9 +46,9 @@ export default function Login() {
 
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <Title level={3} style={{ marginBottom: 4 }}>
-            Acceso al sistema
+            Task Manager
           </Title>
-          <Text type="secondary">Ingresa con tu cuenta corporativa</Text>
+          <Text type="secondary">Ingresa con tu cuenta SIGSA</Text>
         </div>
 
         <Form layout="vertical" onFinish={handleFinish} requiredMark={false}>

@@ -53,7 +53,6 @@ export default function AppSider() {
         overflow: 'auto',
         height: '100vh',
         zIndex: 1001,
-        paddingBottom: 110,
       }}
     >
       <div style={{ 
@@ -75,18 +74,43 @@ export default function AppSider() {
         style={{ 
           background: 'transparent', 
           border: 'none',
-          padding: '0 8px'
+          padding: '0 8px',
+          marginBottom: '80px'
         }}
       />
 
-      <div style={{ position: 'sticky', bottom: 0, marginTop: 16, padding: 16, background: token.colorBgContainer, borderTop: `1px solid ${token.colorBorderSecondary}` }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, color: token.colorText }}>
-          <UserOutlined />
-          <Text style={{ fontSize: 14, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: token.colorText }}>
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 24,
+          left: 0,
+          right: 0,
+          padding: '16px',
+          background: token.colorBgContainer,
+          borderTop: `1px solid ${token.colorBorderSecondary}`,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 }}>
+          <UserOutlined style={{ color: token.colorTextSecondary }} />
+          <Text
+            ellipsis
+            style={{ 
+              fontSize: 13, 
+              fontWeight: 500, 
+              color: token.colorText,
+              maxWidth: 180,
+              textAlign: 'center'
+            }}
+          >
             {nombre || 'Usuario'}
           </Text>
         </div>
-        <Button block icon={<LogoutOutlined />} onClick={() => { logout(); navigate('/login', { replace: true }) }}>
+        <Button 
+          block 
+          size="small"
+          icon={<LogoutOutlined />} 
+          onClick={() => { logout(); navigate('/login', { replace: true }) }}
+        >
           Cerrar sesión
         </Button>
       </div>
