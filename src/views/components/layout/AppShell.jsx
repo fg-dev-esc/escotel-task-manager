@@ -9,8 +9,8 @@ export default function AppShell() {
     <ConfigProvider>
       <Layout style={{ minHeight: '100vh', background: '#FFFFFF' }}>
         <AppSider />
-        <Layout style={{ marginLeft: '250px', background: '#FFFFFF' }}>
-          <Content style={{ padding: '32px', overflow: 'auto', background: '#FFFFFF' }}>
+        <Layout style={{ marginLeft: '250px', background: '#FFFFFF', minHeight: '100vh' }}>
+          <Content style={{ padding: '32px', overflow: 'auto', background: '#FFFFFF', minHeight: '100vh' }}>
             <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
               <Outlet />
             </div>

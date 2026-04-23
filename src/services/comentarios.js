@@ -3,7 +3,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore'
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage'
 import { db, storage } from '../lib/firebase'
 
-export async function agregarComentario(tareaId, texto, fotosFiles = []) {
+export async function agregarComentario(tareaId, texto, fotosFiles = [], autor = '') {
   try {
     if (!texto?.trim()) {
       throw new Error('El comentario no puede estar vacío')
@@ -40,6 +40,7 @@ export async function agregarComentario(tareaId, texto, fotosFiles = []) {
     const nuevoComentario = {
       id: comentarioId,
       texto: texto.trim(),
+      autor,
       fotos: fotosUpload,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()

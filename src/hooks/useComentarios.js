@@ -30,13 +30,13 @@ export function useComentarios(tareaId) {
 
   // Agregar comentario
   const agregarComentario = useCallback(
-    async (texto, fotos = []) => {
+    async (texto, fotos = [], autor = '') => {
       if (!tareaId) return false
 
       try {
         setLoading(true)
         setError(null)
-        const nuevoComentario = await agregarComentarioService(tareaId, texto, fotos)
+        const nuevoComentario = await agregarComentarioService(tareaId, texto, fotos, autor)
         setComentarios(prev => [nuevoComentario, ...prev])
         return true
       } catch (err) {

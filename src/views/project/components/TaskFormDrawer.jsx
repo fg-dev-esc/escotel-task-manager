@@ -3,9 +3,11 @@ import { useEffect } from 'react'
 import dayjs from 'dayjs'
 import ComentariosSection from './ComentariosSection'
 import { useComentarios } from '../../../hooks/useComentarios'
+import { useAuth } from '../../../context/AuthContext'
 
 export default function TaskFormDrawer({ open, tarea, onClose, onSubmit }) {
   const [form] = Form.useForm()
+  const { nombre } = useAuth()
 
   // Hook para comentarios
   const {
@@ -91,9 +93,9 @@ export default function TaskFormDrawer({ open, tarea, onClose, onSubmit }) {
           onActualizar={actualizarComentario}
           onEliminar={eliminarComentario}
           loading={loadingComentarios}
+          autor={nombre}
         />
       </Form>
     </Drawer>
   )
 }
-

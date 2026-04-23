@@ -1,21 +1,24 @@
-import { Layout, Menu, theme } from 'antd'
-import { DashboardOutlined } from '@ant-design/icons'
+import { Layout, Menu, Button, theme, Typography } from 'antd'
+import { DashboardOutlined, LogoutOutlined, UserOutlined } from '@ant-design/icons'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAreas } from '../../../hooks/useAreas.jsx'
 import { getIconComponent } from '../../../utils/icons'
 import logoEscotel from '../../../assets/logo.png'
+import { useAuth } from '../../../context/AuthContext'
 
 const { Sider } = Layout
+const { Text } = Typography
 
 export default function AppSider() {
   const navigate = useNavigate()
   const location = useLocation()
   const { areas } = useAreas()
   const { token } = theme.useToken()
+  const { nombre, logout } = useAuth()
 
   const menuItems = [
     {
-      key: 'dashboard',
+      key: '/',
       icon: <DashboardOutlined />,
       label: 'Dashboard',
       onClick: () => navigate('/'),
@@ -50,6 +53,7 @@ export default function AppSider() {
         overflow: 'auto',
         height: '100vh',
         zIndex: 1001,
+        paddingBottom: 110,
       }}
     >
       <div style={{ 
@@ -74,6 +78,18 @@ export default function AppSider() {
           padding: '0 8px'
         }}
       />
+
+      <div style={{ position: 'sticky', bottom: 0, marginTop: 16, padding: 16, background: token.colorBgContainer, borderTop: `1px solid ${token.colorBorderSecondary}` }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12, color: token.colorText }}>
+          <UserOutlined />
+          <Text style={{ fontSize: 14, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', color: token.colorText }}>
+            {nombre || 'Usuario'}
+          </Text>
+        </div>
+        <Button block icon={<LogoutOutlined />} onClick={() => { logout(); navigate('/login', { replace: true }) }}>
+          Cerrar sesión
+        </Button>
+      </div>
     </Sider>
   )
 }

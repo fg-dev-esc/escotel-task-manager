@@ -27,7 +27,8 @@ export default function ComentariosSection({
   onAgregar,
   onActualizar,
   onEliminar,
-  loading
+  loading,
+  autor
 }) {
   const [editandoId, setEditandoId] = useState(null)
 
@@ -97,7 +98,7 @@ export default function ComentariosSection({
 
       {/* FORM - NUEVO COMENTARIO */}
       {editandoId === null && (
-        <FormAgregarComentario tareaId={tareaId} onAgregar={onAgregar} loading={loading} />
+        <FormAgregarComentario tareaId={tareaId} onAgregar={onAgregar} loading={loading} autor={autor} />
       )}
     </div>
   )
@@ -115,14 +116,19 @@ function ComentarioItem({ comentario, onEditar, onEliminar }) {
       }}
     >
       {/* HEADER: Fecha y botones */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-        <small style={{ color: '#666', fontSize: '12px' }}>
-          {dayjs(comentario.createdAt).fromNow()}
-          {comentario.updatedAt !== comentario.createdAt && (
-            <span style={{ marginLeft: '8px', color: '#999' }}>(editado)</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+          <small style={{ color: '#666', fontSize: '12px' }}>
+            {dayjs(comentario.createdAt).fromNow()}
+            {comentario.updatedAt !== comentario.createdAt && (
+              <span style={{ marginLeft: '8px', color: '#999' }}>(editado)</span>
+            )}
+          </small>
+          {comentario.autor && (
+            <small style={{ color: '#999', fontSize: '12px', marginLeft: '8px' }}>
+              {comentario.autor}
+            </small>
           )}
-        </small>
-        <Space size="small">
+          <Space size="small">
           <Button
             type="text"
             size="small"
@@ -183,7 +189,7 @@ function ComentarioItem({ comentario, onEditar, onEliminar }) {
 /**
   Formulario para agregar comentario
  */
-function FormAgregarComentario({ tareaId, onAgregar, loading }) {
+function FormAgregarComentario({ tareaId, onAgregar, loading, autor }) {
   const [texto, setTexto] = useState('')
   const [fotos, setFotos] = useState([])
 
@@ -194,7 +200,7 @@ function FormAgregarComentario({ tareaId, onAgregar, loading }) {
     }
 
     const fotosFiles = fotos.map(f => f.originFileObj)
-    const éxito = await onAgregar(texto, fotosFiles)
+    const éxito = await onAgregar(texto, fotosFiles, autor)
 
     if (éxito) {
       setTexto('')
