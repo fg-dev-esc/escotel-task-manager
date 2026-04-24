@@ -1,4 +1,4 @@
-const LOGIN_URL = 'https://dev-sigsa.backend.escotel.mx/api/auth/login'
+const LOGIN_URL = `${import.meta.env.VITE_SIGSA_LOGIN_URL}/api/auth/login`
 
 export async function login(email, password) {
   const response = await fetch(LOGIN_URL, {
