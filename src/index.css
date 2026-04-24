@@ -258,64 +258,6 @@ select {
   font-weight: 700;
 }
 
-.app-auth-accent {
-  margin-top: 18px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.app-auth-accent-line {
-  width: 88px;
-  height: 2px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #8f1419, #ca2228 45%, rgba(202, 34, 40, 0.08));
-  position: relative;
-  overflow: hidden;
-}
-
-.app-auth-accent-line::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  transform: translateX(-120%);
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.7), transparent);
-  animation: app-auth-accent-shine 4.8s ease-in-out infinite;
-}
-
-.app-auth-accent-node {
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: #ca2228;
-  box-shadow: 0 0 0 5px rgba(202, 34, 40, 0.08);
-  position: relative;
-  animation: app-auth-accent-pulse 3.2s ease-in-out infinite;
-}
-
-@keyframes app-auth-accent-shine {
-  0%,
-  45% {
-    transform: translateX(-120%);
-  }
-  75%,
-  100% {
-    transform: translateX(120%);
-  }
-}
-
-@keyframes app-auth-accent-pulse {
-  0%,
-  100% {
-    transform: scale(1);
-    box-shadow: 0 0 0 5px rgba(202, 34, 40, 0.08);
-  }
-  50% {
-    transform: scale(1.08);
-    box-shadow: 0 0 0 10px rgba(202, 34, 40, 0.035);
-  }
-}
-
 .app-auth-copy {
   margin-top: 20px;
   max-width: 48ch;

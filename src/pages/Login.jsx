@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Button, Card, Form, Input, message } from 'antd'
 import { UserOutlined, LockOutlined, ArrowRightOutlined } from '@ant-design/icons'
 import { useLocation, useNavigate } from 'react-router-dom'
@@ -10,6 +10,59 @@ export default function Login() {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
+  const canvasRef = useRef(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    let animationId
+    const particles = []
+
+    const resizeCanvas = () => {
+      const hero = canvas.parentElement
+      canvas.width = hero.offsetWidth
+      canvas.height = hero.offsetHeight
+    }
+    resizeCanvas()
+    window.addEventListener('resize', resizeCanvas)
+
+    for (let i = 0; i < 25; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 3 + 1,
+        speedX: Math.random() * 0.5 - 0.25,
+        speedY: Math.random() * 0.5 - 0.25,
+        color: `rgba(202, 34, 40, ${Math.random() * 0.3 + 0.1})`
+      })
+    }
+
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      particles.forEach(p => {
+        p.x += p.speedX
+        p.y += p.speedY
+
+        if (p.x < 0) p.x = canvas.width
+        if (p.x > canvas.width) p.x = 0
+        if (p.y < 0) p.y = canvas.height
+        if (p.y > canvas.height) p.y = 0
+
+        ctx.fillStyle = p.color
+        ctx.beginPath()
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
+        ctx.fill()
+      })
+      animationId = requestAnimationFrame(animate)
+    }
+    animate()
+
+    return () => {
+      cancelAnimationFrame(animationId)
+      window.removeEventListener('resize', resizeCanvas)
+    }
+  }, [])
 
   const handleFinish = async (values) => {
     try {
@@ -33,12 +86,18 @@ export default function Login() {
     <div className="app-auth-screen">
       <div className="app-auth-grid">
         <section className="app-auth-hero">
-          <div className="app-auth-hero-content">
+          <canvas
+            ref={canvasRef}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              pointerEvents: 'none',
+              zIndex: 0
+            }}
+          />
+          <div className="app-auth-hero-content" style={{ position: 'relative', zIndex: 1 }}>
             <h1 className="app-auth-title" style={{ marginTop: 0 }}>Task Manager</h1>
-            <div className="app-auth-accent" aria-hidden="true">
-              <span className="app-auth-accent-line" />
-              <span className="app-auth-accent-node" />
-            </div>
           </div>
         </section>
 
