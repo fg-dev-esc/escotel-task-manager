@@ -5,12 +5,10 @@ import { useEffect, useRef, useState } from 'react'
 const { Text } = Typography
 
 const colors = [
-  '#2F6BFF', '#5B8CFF', '#7A5CFA',
-  '#14B8A6', '#10B981', '#22C55E',
-  '#F59E0B', '#D97706', '#F97316',
-  '#EC4899', '#DB2777', '#64748B',
-  '#94A3B8', '#1E293B', '#8B5CF6',
-  '#0EA5E9', '#06B6D4', '#475569'
+  '#A96B52', '#F0ABFC', '#34D399',
+  '#60A5FA', '#FBBF24', '#FB7185',
+  '#2DD4BF', '#C4B5FD', '#F87171',
+  '#D97706', '#818CF8', '#FDBA74'
 ]
 
 export default function ProjectForm({ visible, project, onClose, onSubmit }) {
