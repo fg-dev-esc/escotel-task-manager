@@ -2,21 +2,26 @@ import { useState } from 'react'
 import { Button, Card, Form, Input, message } from 'antd'
 import { UserOutlined, LockOutlined, ArrowRightOutlined } from '@ant-design/icons'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { useAuth } from '../context/AuthContext'
+import { login as loginRequest } from '../services/auth'
+import { setToken } from '../utils/auth'
 import logoEscotel from '../assets/logo.png'
 
 export default function Login() {
   const [loading, setLoading] = useState(false)
-  const { login } = useAuth()
   const navigate = useNavigate()
   const location = useLocation()
 
   const handleFinish = async (values) => {
     try {
       setLoading(true)
-      await login(values.email, values.password)
-      const redirectTo = location.state?.from?.pathname || '/'
-      navigate(redirectTo, { replace: true })
+      const response = await loginRequest(values.email, values.password)
+      if (response?.token) {
+        setToken(response.token)
+        const redirectTo = location.state?.from?.pathname || '/'
+        navigate(redirectTo, { replace: true })
+      } else {
+        throw new Error('Token no recibido')
+      }
     } catch (error) {
       message.error(error.message || 'Error al iniciar sesión')
     } finally {

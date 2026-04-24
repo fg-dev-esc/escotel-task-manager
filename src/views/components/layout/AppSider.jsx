@@ -3,7 +3,7 @@ import { DashboardOutlined, LogoutOutlined, MenuFoldOutlined, MenuUnfoldOutlined
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAreas } from '../../../hooks/useAreas.jsx'
 import { getIconComponent } from '../../../utils/icons'
-import { useAuth } from '../../../context/AuthContext'
+import { getNombre, clearToken } from '../../../utils/auth'
 import logoEscotel from '../../../assets/logo.png'
 
 const { Sider } = Layout
@@ -24,7 +24,12 @@ export default function AppSider({ collapsed, onCollapse }) {
   const location = useLocation()
   const { areas } = useAreas()
   const { token } = theme.useToken()
-  const { nombre, logout } = useAuth()
+  const nombre = getNombre()
+
+  const handleLogout = () => {
+    clearToken()
+    navigate('/login', { replace: true })
+  }
 
   const menuItems = [
     {
@@ -173,7 +178,7 @@ export default function AppSider({ collapsed, onCollapse }) {
           <Button
             type="text"
             icon={<LogoutOutlined />}
-            onClick={() => { logout(); navigate('/login', { replace: true }) }}
+            onClick={handleLogout}
             danger
             title="Cerrar sesión"
           >

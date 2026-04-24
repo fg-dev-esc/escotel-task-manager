@@ -3,14 +3,14 @@ import { useEffect } from 'react'
 import dayjs from 'dayjs'
 import ComentariosSection from './ComentariosSection'
 import { useComentarios } from '../../../hooks/useComentarios'
-import { useAuth } from '../../../context/AuthContext'
+import { getNombre } from '../../../utils/auth'
 
 const { Text } = Typography
 
 export default function TaskFormDrawer({ open, tarea, onClose, onSubmit }) {
   const [form] = Form.useForm()
   const { token } = theme.useToken()
-  const { nombre } = useAuth()
+  const nombre = getNombre()
 
   // Hook para comentarios
   const {
@@ -30,6 +30,7 @@ export default function TaskFormDrawer({ open, tarea, onClose, onSubmit }) {
         titulo: tarea.titulo,
         descripcion: tarea.descripcion,
         prioridad: tarea.prioridad,
+        estado: tarea.estado,
         dueDate: tarea.dueDate ? dayjs(tarea.dueDate) : null,
       })
     } else {
@@ -82,6 +83,15 @@ export default function TaskFormDrawer({ open, tarea, onClose, onSubmit }) {
       <Form form={form} layout="vertical" onFinish={handleSubmit} requiredMark={false}>
         <Form.Item label={<span className="app-kicker">Título</span>} name="titulo" rules={[{ required: true }]}>
           <Input placeholder="Qué hay que hacer?" size="large" />
+        </Form.Item>
+
+        <Form.Item label={<span className="app-kicker">Estado</span>} name="estado">
+          <Select size="large">
+            <Select.Option value="todo">Por hacer</Select.Option>
+            <Select.Option value="in_progress">En curso</Select.Option>
+            <Select.Option value="in_review">En revisión</Select.Option>
+            <Select.Option value="done">Completado</Select.Option>
+          </Select>
         </Form.Item>
 
         <Form.Item label={<span className="app-kicker">Descripción</span>} name="descripcion">

@@ -104,7 +104,7 @@ export default function Projects() {
             Áreas
           </Title>
           {/* <Text className="app-subtitle" style={{ display: 'block' }}>
-            Organiza proyectos con una vista limpia, densa y precisa. Cada tarjeta actúa como acceso directo al trabajo.
+            Cada tarjeta actúa como acceso directo al trabajo.
           </Text> */}
         </div>
 

@@ -6,7 +6,7 @@
   --font-mono: 'Geist Mono', 'JetBrains Mono', 'SFMono-Regular', monospace;
   --app-bg: #f5f7fb;
   --app-surface: #ffffff;
-  --app-surface-2: #f8fafc;
+  --app-surface-alt: #f8fafc;
   --app-border: #e4e7ec;
   --app-border-strong: #d8e0ea;
   --app-text: #0f172a;
@@ -36,10 +36,7 @@ body {
   color: var(--app-text);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background:
-    radial-gradient(circle at top left, rgba(47, 107, 255, 0.08), transparent 32%),
-    radial-gradient(circle at top right, rgba(15, 23, 42, 0.04), transparent 24%),
-    var(--app-bg);
+  background: var(--app-bg);
   min-width: 320px;
 }
 
@@ -117,16 +114,14 @@ select {
 }
 
 .app-panel {
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--app-surface);
   border: 1px solid var(--app-border);
   border-radius: var(--app-radius-lg);
   box-shadow: var(--app-shadow-sm);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
 }
 
 .app-soft-panel {
-  background: rgba(248, 250, 252, 0.9);
+  background: var(--app-surface);
   border: 1px solid var(--app-border);
   border-radius: var(--app-radius-lg);
 }
@@ -134,12 +129,8 @@ select {
 .app-empty-shell {
   border: 1px dashed var(--app-border-strong);
   border-radius: var(--app-radius-lg);
-  background: rgba(255, 255, 255, 0.78);
+  background: var(--app-surface);
   box-shadow: var(--app-shadow-sm);
-}
-
-.app-mono {
-  font-family: var(--font-mono);
 }
 
 .app-badge {
@@ -166,7 +157,7 @@ select {
   padding: 16px 18px;
   border-radius: 14px;
   border: 1px solid var(--app-border);
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--app-surface);
   box-shadow: var(--app-shadow-sm);
 }
 
@@ -468,7 +459,7 @@ select {
 }
 
 .app-table-row:hover > td {
-  background: #f8fafc !important;
+  background: #ffffff !important;
 }
 
 .ant-table-wrapper .ant-table-thead > tr > th {

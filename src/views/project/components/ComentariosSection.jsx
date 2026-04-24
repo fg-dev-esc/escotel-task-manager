@@ -1,8 +1,7 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import {
   Button,
   Input,
-  Upload,
   Badge,
   Space,
   Modal,
@@ -13,7 +12,7 @@ import {
   Typography,
   Divider
 } from 'antd'
-import { DeleteOutlined, EditOutlined, PictureOutlined, CheckOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons'
+import { DeleteOutlined, EditOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/es'
@@ -23,9 +22,6 @@ dayjs.locale('es')
 
 const { Text } = Typography
 
-/**
- * Sección de comentarios con historial
- */
 export default function ComentariosSection({
   tareaId,
   comentarios,
@@ -36,7 +32,6 @@ export default function ComentariosSection({
   autor
 }) {
   const [editandoId, setEditandoId] = useState(null)
-  const totalAdjuntos = useMemo(() => comentarios.reduce((acc, comentario) => acc + (comentario.fotos?.length || 0), 0), [comentarios])
 
   return (
     <Card className="app-panel" style={{ marginBottom: 16 }} bodyStyle={{ padding: 20 }}>
@@ -80,8 +75,8 @@ export default function ComentariosSection({
                   key={comentario.id}
                   comentario={comentario}
                   loading={loading}
-                  onGuardar={(texto, fotosNuevas, fotosAEliminar) => {
-                    onActualizar(comentario.id, texto, fotosNuevas, fotosAEliminar)
+                  onGuardar={(texto) => {
+                    onActualizar(comentario.id, texto)
                     setEditandoId(null)
                   }}
                   onCancelar={() => setEditandoId(null)}
@@ -111,7 +106,7 @@ export default function ComentariosSection({
       <Divider style={{ margin: '0 0 16px' }} />
 
       {editandoId === null && (
-        <FormAgregarComentario tareaId={tareaId} onAgregar={onAgregar} loading={loading} autor={autor} />
+        <FormAgregarComentario onAgregar={onAgregar} loading={loading} autor={autor} />
       )}
     </Card>
   )
@@ -124,7 +119,7 @@ function ComentarioItem({ comentario, onEditar, onEliminar }) {
         padding: 14,
         border: '1px solid var(--app-border)',
         borderRadius: 16,
-        background: 'rgba(255,255,255,0.82)',
+        background: '#ffffff',
         marginBottom: 12,
       }}
     >
@@ -149,44 +144,12 @@ function ComentarioItem({ comentario, onEditar, onEliminar }) {
       <Text style={{ display: 'block', margin: '8px 0 12px', wordBreak: 'break-word', lineHeight: 1.65 }}>
         {comentario.texto}
       </Text>
-
-      {comentario.fotos && comentario.fotos.length > 0 && (
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {comentario.fotos.map(foto => (
-            <div
-              key={foto.id}
-              style={{
-                position: 'relative',
-                cursor: 'pointer',
-                borderRadius: 12,
-                overflow: 'hidden',
-                border: '1px solid var(--app-border)',
-                width: 84,
-                height: 84,
-                background: '#fff'
-              }}
-              title={foto.nombre}
-              onClick={() => window.open(foto.url, '_blank')}
-            >
-              <img
-                src={foto.url}
-                alt={foto.nombre}
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   )
 }
 
-/**
-  Formulario para agregar comentario
- */
-function FormAgregarComentario({ tareaId, onAgregar, loading, autor }) {
+function FormAgregarComentario({ onAgregar, loading, autor }) {
   const [texto, setTexto] = useState('')
-  const [fotos, setFotos] = useState([])
 
   const handleSubmit = async () => {
     if (!texto.trim()) {
@@ -194,12 +157,10 @@ function FormAgregarComentario({ tareaId, onAgregar, loading, autor }) {
       return
     }
 
-    const fotosFiles = fotos.map(f => f.originFileObj)
-    const éxito = await onAgregar(texto, fotosFiles, autor)
+    const éxito = await onAgregar(texto, autor)
 
     if (éxito) {
       setTexto('')
-      setFotos([])
       message.success('Comentario agregado')
     } else {
       message.error('Error al agregar comentario')
@@ -217,7 +178,7 @@ function FormAgregarComentario({ tareaId, onAgregar, loading, autor }) {
         style={{ marginBottom: 10 }}
       />
 
-<div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
         <div style={{ marginLeft: 'auto' }}>
           <Button
             type="primary"
@@ -229,47 +190,12 @@ function FormAgregarComentario({ tareaId, onAgregar, loading, autor }) {
           </Button>
         </div>
       </div>
-
-      {/* Preview de fotos seleccionadas */}
-      {fotos.length > 0 && (
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
-          {fotos.map(file => (
-            <div
-              key={file.uid}
-              style={{
-                width: 64,
-                height: 64,
-                borderRadius: 12,
-                overflow: 'hidden',
-                border: '1px solid var(--app-border)'
-              }}
-            >
-              <img
-                src={URL.createObjectURL(file.originFileObj)}
-                alt="preview"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            </div>
-          ))}
-        </div>
-      )}
     </div>
   )
 }
 
-/**
- * Sub-componente: Formulario para editar comentario
- */
 function FormEditarComentario({ comentario, loading, onGuardar, onCancelar }) {
   const [texto, setTexto] = useState(comentario.texto)
-  const [fotosNuevas, setFotosNuevas] = useState([])
-  const [fotosAEliminar, setFotosAEliminar] = useState([])
-  const [fotosRestantes, setFotosRestantes] = useState(comentario.fotos || [])
-
-  const handleEliminarFoto = fotoId => {
-    setFotosRestantes(prev => prev.filter(f => f.id !== fotoId))
-    setFotosAEliminar(prev => [...prev, fotoId])
-  }
 
   const handleGuardar = async () => {
     if (!texto.trim()) {
@@ -277,8 +203,7 @@ function FormEditarComentario({ comentario, loading, onGuardar, onCancelar }) {
       return
     }
 
-    const fotosFiles = fotosNuevas.map(f => f.originFileObj)
-    const éxito = await onGuardar(texto, fotosFiles, fotosAEliminar)
+    const éxito = await onGuardar(texto)
 
     if (éxito) {
       message.success('Comentario actualizado')
@@ -303,100 +228,6 @@ function FormEditarComentario({ comentario, loading, onGuardar, onCancelar }) {
         style={{ marginBottom: 10 }}
       />
 
-      {/* Fotos existentes */}
-      {fotosRestantes.length > 0 && (
-        <div style={{ marginBottom: 10 }}>
-          <Text type="secondary" style={{ display: 'block', marginBottom: 6, fontSize: 12 }}>Fotos actuales</Text>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {fotosRestantes.map(foto => (
-              <div
-                key={foto.id}
-                style={{
-                  position: 'relative',
-                  width: 64,
-                  height: 64,
-                  borderRadius: 12,
-                  overflow: 'hidden',
-                  border: '1px solid var(--app-border)'
-                }}
-              >
-                <img
-                  src={foto.url}
-                  alt="actual"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-                <Button
-                  type="text"
-                  danger
-                  size="small"
-                  icon={<DeleteOutlined />}
-                  onClick={() => handleEliminarFoto(foto.id)}
-                  style={{
-                    position: 'absolute',
-                    top: 0,
-                    right: 0,
-                    width: '100%',
-                    height: '100%',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: 'rgba(15, 23, 42, 0.55)',
-                    opacity: 0,
-                    transition: 'opacity 0.3s'
-                  }}
-                  onMouseEnter={e => {
-                    e.currentTarget.style.opacity = '1'
-                  }}
-                  onMouseLeave={e => {
-                    e.currentTarget.style.opacity = '0'
-                  }}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Agregar nuevas fotos */}
-      <div style={{ marginBottom: 10 }}>
-        <Upload
-          multiple
-          maxCount={5 - fotosRestantes.length}
-          beforeUpload={() => false}
-          onChange={info => setFotosNuevas(info.fileList)}
-          accept="image/*"
-        >
-          <Button icon={<PlusOutlined />} disabled={loading}>
-            Agregar fotos ({fotosNuevas.length}/{5 - fotosRestantes.length})
-          </Button>
-        </Upload>
-      </div>
-
-      {/* Preview nuevas fotos */}
-      {fotosNuevas.length > 0 && (
-<div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 10, justifyContent: 'flex-end' }}>
-          {fotosNuevas.map(file => (
-            <div
-              key={file.uid}
-              style={{
-                width: 64,
-                height: 64,
-                borderRadius: 12,
-                overflow: 'hidden',
-                border: '1px solid var(--app-border)'
-              }}
-            >
-              <img
-                src={URL.createObjectURL(file.originFileObj)}
-                alt="preview"
-                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-              />
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Botones */}
       <Space>
         <Button
           type="primary"

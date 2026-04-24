@@ -34,15 +34,15 @@ export default function TaskKanban({
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
-      <div
+<div
         className="app-soft-panel"
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, minmax(280px, 1fr))',
-          gap: 18,
+          gridTemplateColumns: 'repeat(4, minmax(220px, 1fr))',
+          gap: 14,
           width: '100%',
           minHeight: '70vh',
-          padding: 18,
+          padding: 14,
           overflowX: 'auto',
           boxShadow: 'var(--app-shadow-sm)',
         }}

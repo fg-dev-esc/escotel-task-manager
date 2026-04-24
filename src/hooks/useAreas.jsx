@@ -8,7 +8,6 @@ export function AreasProvider({ children }) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  // [QUERY 1] Cargar áreas una sola vez
   useEffect(() => {
     const cargarAreas = async () => {
       try {

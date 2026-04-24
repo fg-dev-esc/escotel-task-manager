@@ -28,15 +28,14 @@ export function useComentarios(tareaId) {
     }
   }, [tareaId])
 
-  // Agregar comentario
   const agregarComentario = useCallback(
-    async (texto, fotos = [], autor = '') => {
+    async (texto, autor = '') => {
       if (!tareaId) return false
 
       try {
         setLoading(true)
         setError(null)
-        const nuevoComentario = await agregarComentarioService(tareaId, texto, fotos, autor)
+        const nuevoComentario = await agregarComentarioService(tareaId, texto, autor)
         setComentarios(prev => [nuevoComentario, ...prev])
         return true
       } catch (err) {
@@ -50,9 +49,8 @@ export function useComentarios(tareaId) {
     [tareaId]
   )
 
-  // Actualizar comentario
   const actualizarComentario = useCallback(
-    async (comentarioId, texto, fotosNuevas = [], fotosAEliminar = []) => {
+    async (comentarioId, texto) => {
       if (!tareaId) return false
 
       try {
@@ -61,11 +59,8 @@ export function useComentarios(tareaId) {
         const comentarioActualizado = await actualizarComentarioService(
           tareaId,
           comentarioId,
-          texto,
-          fotosNuevas,
-          fotosAEliminar
+          texto
         )
-        // Actualizar en la lista
         setComentarios(prev =>
           prev.map(c => (c.id === comentarioId ? comentarioActualizado : c))
         )
@@ -81,7 +76,6 @@ export function useComentarios(tareaId) {
     [tareaId]
   )
 
-  // Eliminar comentario
   const eliminarComentario = useCallback(
     async (comentarioId) => {
       if (!tareaId) return false
@@ -90,7 +84,6 @@ export function useComentarios(tareaId) {
         setLoading(true)
         setError(null)
         await eliminarComentarioService(tareaId, comentarioId)
-        // Remover de la lista
         setComentarios(prev => prev.filter(c => c.id !== comentarioId))
         return true
       } catch (err) {

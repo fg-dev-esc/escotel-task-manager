@@ -18,8 +18,6 @@ export async function obtenerTareasPorArea(areaId) {
       return []
     }
 
-    // NOTA: Sin orderBy para evitar requerir índice compuesto
-    // Ordenamos en cliente después
     const q = query(
       collection(db, 'tareas'),
       where('areaId', '==', areaId)
@@ -30,7 +28,6 @@ export async function obtenerTareasPorArea(areaId) {
       ...doc.data()
     }))
     
-    // Ordenar en cliente por createdAt descendente
     return tareas.sort((a, b) => 
       new Date(b.createdAt) - new Date(a.createdAt)
     )
@@ -140,34 +137,5 @@ export async function eliminarTareasPorArea(areaId) {
   } catch (error) {
     console.error('Error eliminando tareas por área:', error)
     throw error
-  }
-}
-
-// OBTENER TODAS LAS TAREAS (para búsqueda global)
-export async function obtenerTodasLasTareas() {
-  try {
-    const snapshot = await getDocs(collection(db, 'tareas'))
-    return snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }))
-  } catch (error) {
-    console.error('Error obteniendo todas las tareas:', error)
-    return []
-  }
-}
-
-// BUSCAR TAREAS (búsqueda local)
-export async function buscarTareas(termino) {
-  try {
-    const todas = await obtenerTodasLasTareas()
-    return todas.filter(
-      tarea =>
-        tarea.titulo.toLowerCase().includes(termino.toLowerCase()) ||
-        tarea.descripcion?.toLowerCase().includes(termino.toLowerCase())
-    )
-  } catch (error) {
-    console.error('Error buscando tareas:', error)
-    return []
   }
 }

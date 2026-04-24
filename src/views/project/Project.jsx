@@ -90,12 +90,22 @@ export default function Project() {
             Volver
           </Button>
           <div className="app-kicker">Project workspace</div>
-          <Title level={1} className="app-title" style={{ margin: 0 }}>
-            {areaDisplay}
-          </Title>
+          {loading ? (
+            <Skeleton.Input active size="large" style={{ width: 200, height: 38, marginTop: 4 }} />
+          ) : (
+            <Title level={1} className="app-title" style={{ margin: 0 }}>
+              {areaDisplay}
+            </Title>
+          )}
+{loading ? (
+            <Skeleton.Input active size="small" style={{ width: 160, height: 16, marginTop: 8 }} />
+          ) : (
+            <div>{/* 
           <Text className="app-subtitle" style={{ display: 'block' }}>
             {stats.activas} activas · {stats.completadas} completadas{stats.vencidas > 0 ? ` · ${stats.vencidas} vencidas` : ''}
           </Text>
+        */}</div>
+          )}
         </div>
 
         <Space size={12} wrap>
@@ -114,21 +124,43 @@ export default function Project() {
       </header>
 
       <div className="app-surface-row" style={{ marginBottom: 24 }}>
-        <div className="app-stat">
-          <div className="app-stat-label">Activas</div>
-          <div className="app-stat-value">{stats.activas}</div>
-          <div className="app-stat-meta">Tareas aún en progreso.</div>
-        </div>
-        <div className="app-stat">
-          <div className="app-stat-label">Completadas</div>
-          <div className="app-stat-value">{stats.completadas}</div>
-          <div className="app-stat-meta">Trabajo finalizado y cerrado.</div>
-        </div>
-        <div className="app-stat">
-          <div className="app-stat-label">Vencidas</div>
-          <div className="app-stat-value">{stats.vencidas}</div>
-          <div className="app-stat-meta">Atención operativa requerida.</div>
-        </div>
+        {loading ? (
+          <>
+            <div className="app-stat">
+              <Skeleton.Input active size="small" style={{ width: 60, height: 12, marginBottom: 8 }} />
+              <Skeleton.Input active size="large" style={{ width: 40, height: 32 }} />
+              <Skeleton.Input active size="small" style={{ width: 120, height: 12, marginTop: 8 }} />
+            </div>
+            <div className="app-stat">
+              <Skeleton.Input active size="small" style={{ width: 80, height: 12, marginBottom: 8 }} />
+              <Skeleton.Input active size="large" style={{ width: 40, height: 32 }} />
+              <Skeleton.Input active size="small" style={{ width: 140, height: 12, marginTop: 8 }} />
+            </div>
+            <div className="app-stat">
+              <Skeleton.Input active size="small" style={{ width: 60, height: 12, marginBottom: 8 }} />
+              <Skeleton.Input active size="large" style={{ width: 40, height: 32 }} />
+              <Skeleton.Input active size="small" style={{ width: 180, height: 12, marginTop: 8 }} />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="app-stat">
+              <div className="app-stat-label">Activas</div>
+              <div className="app-stat-value">{stats.activas}</div>
+              <div className="app-stat-meta">Tareas aún en progreso.</div>
+            </div>
+            <div className="app-stat">
+              <div className="app-stat-label">Completadas</div>
+              <div className="app-stat-value">{stats.completadas}</div>
+              <div className="app-stat-meta">Trabajo finalizado y cerrado.</div>
+            </div>
+            <div className="app-stat">
+              <div className="app-stat-label">Vencidas</div>
+              <div className="app-stat-value">{stats.vencidas}</div>
+              <div className="app-stat-meta">Atención operativa requerida.</div>
+            </div>
+          </>
+        )}
       </div>
 
       {loading ? (
