@@ -217,7 +217,7 @@ function FormEditarComentario({ comentario, loading, onGuardar, onCancelar }) {
         padding: 14,
         borderRadius: 16,
         marginBottom: 12,
-        background: 'rgba(248,250,252,0.8)'
+        background: '#ffffff'
       }}
     >
       <Input.TextArea

@@ -33,8 +33,8 @@ export default function TaskKanban({
   const tareasAMostrar = tareasLocal.length > 0 ? tareasLocal : tareas
 
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
-<div
+<DragDropContext onDragEnd={handleDragEnd}>
+      <div
         className="app-soft-panel"
         style={{
           display: 'grid',
@@ -43,21 +43,22 @@ export default function TaskKanban({
           width: '100%',
           minHeight: '70vh',
           padding: 14,
-          overflowX: 'auto',
           boxShadow: 'var(--app-shadow-sm)',
+          overflowX: 'auto',
         }}
       >
         {columnas.map((columna) => {
           const tareasColumna = tareasAMostrar.filter(t => t.estado === columna.id)
           return (
-            <div key={columna.id} style={{ minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+            <div key={columna.id} style={{ minWidth: 0, display: 'flex', flexDirection: 'column', height: 'calc(70vh - 40px)' }}>
               <div style={{ 
                 display: 'flex', 
                 justifyContent: 'space-between', 
                 alignItems: 'center',
                 padding: '0 6px 14px',
                 borderBottom: `1px solid ${token.colorBorderSecondary}`,
-                marginBottom: 16
+                marginBottom: 16,
+                flexShrink: 0
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                    <Text style={{ fontWeight: 700, letterSpacing: '-0.02em' }}>{columna.label}</Text>
@@ -72,7 +73,7 @@ export default function TaskKanban({
                    }}>
                      {tareasColumna.length}
                    </span>
-                 </div>
+                </div>
               </div>
 
               <Droppable droppableId={columna.id}>
@@ -82,12 +83,12 @@ export default function TaskKanban({
                     {...provided.droppableProps}
                     style={{
                       flex: 1,
-                      minHeight: 0,
                       padding: 6,
                       background: snapshot.isDraggingOver ? 'rgba(47, 107, 255, 0.05)' : 'transparent',
                       borderRadius: 14,
-                      overflow: 'auto',
-                      transition: 'background-color 0.2s ease'
+                      overflowY: 'auto',
+                      overflowX: 'hidden',
+                      transition: 'background-color 0.2s ease',
                     }}
                   >
                     {tareasColumna.map((tarea, index) => (
