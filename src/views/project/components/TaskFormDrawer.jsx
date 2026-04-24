@@ -1,12 +1,15 @@
-import { Drawer, Form, Input, Select, DatePicker, Button, Space } from 'antd'
+import { Drawer, Form, Input, Select, DatePicker, Button, Space, Typography, Divider, theme } from 'antd'
 import { useEffect } from 'react'
 import dayjs from 'dayjs'
 import ComentariosSection from './ComentariosSection'
 import { useComentarios } from '../../../hooks/useComentarios'
 import { useAuth } from '../../../context/AuthContext'
 
+const { Text } = Typography
+
 export default function TaskFormDrawer({ open, tarea, onClose, onSubmit }) {
   const [form] = Form.useForm()
+  const { token } = theme.useToken()
   const { nombre } = useAuth()
 
   // Hook para comentarios
@@ -20,6 +23,8 @@ export default function TaskFormDrawer({ open, tarea, onClose, onSubmit }) {
   } = useComentarios(tarea?.id)
 
   useEffect(() => {
+    if (!open) return
+
     if (tarea) {
       form.setFieldsValue({
         titulo: tarea.titulo,
@@ -27,8 +32,10 @@ export default function TaskFormDrawer({ open, tarea, onClose, onSubmit }) {
         prioridad: tarea.prioridad,
         dueDate: tarea.dueDate ? dayjs(tarea.dueDate) : null,
       })
+    } else {
+      form.resetFields()
     }
-  }, [tarea, form])
+  }, [tarea, form, open])
 
   // Cargar comentarios cuando se abre el drawer
   useEffect(() => {
@@ -48,44 +55,54 @@ export default function TaskFormDrawer({ open, tarea, onClose, onSubmit }) {
 
   return (
     <Drawer
-      title="EDITAR TAREA"
+      title={
+        <div>
+          <div className="app-kicker">Task editor</div>
+          <Text style={{ fontSize: 18, fontWeight: 650, color: token.colorText }}>Editar tarea</Text>
+        </div>
+      }
       open={open}
       onClose={onClose}
       placement="right"
-      width={500}
+      width={640}
       destroyOnClose
       footer={
         <Space style={{ float: 'right' }}>
-          <Button onClick={onClose}>Cancelar</Button>
-          <Button type="primary" onClick={() => form.submit()}>
+          <Button onClick={onClose} size="large">Cancelar</Button>
+          <Button type="primary" onClick={() => form.submit()} size="large">
             Guardar
           </Button>
         </Space>
       }
+      styles={{
+        header: { borderBottom: `1px solid var(--app-border)` },
+        body: { paddingTop: 24 },
+      }}
     >
-      <Form form={form} layout="vertical" onFinish={handleSubmit}>
-        <Form.Item label="TITULO" name="titulo" rules={[{ required: true }]}>
-          <Input placeholder="Que hay que hacer?" />
+      <Form form={form} layout="vertical" onFinish={handleSubmit} requiredMark={false}>
+        <Form.Item label={<span className="app-kicker">Título</span>} name="titulo" rules={[{ required: true }]}>
+          <Input placeholder="Qué hay que hacer?" size="large" />
         </Form.Item>
 
-        <Form.Item label="DESCRIPCION" name="descripcion">
-          <Input.TextArea rows={3} placeholder="Detalles..." />
+        <Form.Item label={<span className="app-kicker">Descripción</span>} name="descripcion">
+          <Input.TextArea rows={4} placeholder="Detalles..." />
         </Form.Item>
 
-        <Form.Item label="FECHA LIMITE" name="dueDate">
-          <DatePicker style={{ width: '100%' }} />
+        <Form.Item label={<span className="app-kicker">Fecha límite</span>} name="dueDate">
+          <DatePicker style={{ width: '100%' }} size="large" />
         </Form.Item>
 
-        <Form.Item label="PRIORIDAD" name="prioridad" initialValue="medium">
-          <Select>
-            <Select.Option value="critical">CRITICA</Select.Option>
-            <Select.Option value="high">ALTA</Select.Option>
-            <Select.Option value="medium">MEDIA</Select.Option>
-            <Select.Option value="low">BAJA</Select.Option>
+        <Form.Item label={<span className="app-kicker">Prioridad</span>} name="prioridad" initialValue="medium">
+          <Select size="large">
+            <Select.Option value="critical">Crítica</Select.Option>
+            <Select.Option value="high">Alta</Select.Option>
+            <Select.Option value="medium">Media</Select.Option>
+            <Select.Option value="low">Baja</Select.Option>
           </Select>
         </Form.Item>
 
-        {/* SECCIÓN DE COMENTARIOS */}
+        <Divider style={{ margin: '28px 0' }} />
+
         <ComentariosSection
           tareaId={tarea?.id}
           comentarios={comentarios}

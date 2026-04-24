@@ -9,8 +9,7 @@ export default function TaskKanban({
   tareas, 
   columnas, 
   onMoverTarea, 
-  onTaskClick,
-  onDeleteTask
+  onTaskClick
 }) {
   const [tareasLocal, setTareasLocal] = useState(tareas)
   const { token } = theme.useToken()
@@ -36,13 +35,16 @@ export default function TaskKanban({
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
       <div
+        className="app-soft-panel"
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-          gap: 24,
+          gridTemplateColumns: 'repeat(4, minmax(280px, 1fr))',
+          gap: 18,
           width: '100%',
-          height: 'calc(100vh - 280px)',
-          minHeight: 0,
+          minHeight: '70vh',
+          padding: 18,
+          overflowX: 'auto',
+          boxShadow: 'var(--app-shadow-sm)',
         }}
       >
         {columnas.map((columna) => {
@@ -53,18 +55,20 @@ export default function TaskKanban({
                 display: 'flex', 
                 justifyContent: 'space-between', 
                 alignItems: 'center',
-                padding: '0 8px 16px 8px',
-                borderBottom: `2px solid ${token.colorBorderSecondary}`,
-                marginBottom: 20
+                padding: '0 6px 14px',
+                borderBottom: `1px solid ${token.colorBorderSecondary}`,
+                marginBottom: 16
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                   <Text style={{ fontWeight: 700 }}>{columna.label}</Text>
+                   <Text style={{ fontWeight: 700, letterSpacing: '-0.02em' }}>{columna.label}</Text>
                    <span style={{ 
-                     fontSize: 11, 
-                     background: token.colorBorderSecondary, 
-                     padding: '2px 8px', 
-                     borderRadius: 10,
-                     fontWeight: 600
+                     fontSize: 11,
+                     background: 'rgba(47, 107, 255, 0.08)', 
+                     color: token.colorPrimary,
+                     padding: '4px 10px', 
+                     borderRadius: 999,
+                     fontWeight: 650,
+                     fontFamily: 'var(--font-mono)'
                    }}>
                      {tareasColumna.length}
                    </span>
@@ -79,10 +83,11 @@ export default function TaskKanban({
                     style={{
                       flex: 1,
                       minHeight: 0,
-                      padding: 4,
-                      background: snapshot.isDraggingOver ? token.colorBgContainer : 'transparent',
-                      borderRadius: 4
-                      , overflow: 'auto'
+                      padding: 6,
+                      background: snapshot.isDraggingOver ? 'rgba(47, 107, 255, 0.05)' : 'transparent',
+                      borderRadius: 14,
+                      overflow: 'auto',
+                      transition: 'background-color 0.2s ease'
                     }}
                   >
                     {tareasColumna.map((tarea, index) => (
@@ -95,9 +100,10 @@ export default function TaskKanban({
                             style={{
                               ...provided.draggableProps.style,
                               marginBottom: 12,
+                              alignSelf: 'flex-start',
                             }}
                           >
-                            <TaskCard tarea={tarea} onClick={() => onTaskClick(tarea)} />
+                            <TaskCard tarea={tarea} onClick={() => onTaskClick(tarea)} dragging={snapshot.isDragging} />
                           </div>
                         )}
                       </Draggable>

@@ -1,14 +1,16 @@
-import { Modal, Form, Input, Select, theme, Space } from 'antd'
+import { Modal, Form, Input, Select, theme, Space, Typography } from 'antd'
 import { iconOptions } from '../../../utils/icons'
 import { useEffect, useRef, useState } from 'react'
 
+const { Text } = Typography
+
 const colors = [
-  '#FFE4E1', '#FF8A95', '#FF4757',
-  '#FFD89B', '#FFA940', '#FF7A45',
-  '#C1E1A6', '#7CB342', '#558B2F',
-  '#B2DFDB', '#4DD0E1', '#00BCD4',
-  '#C5CAE9', '#7986CB', '#3F51B5',
-  '#E1BEE7', '#BA68C8', '#9C27B0'
+  '#2F6BFF', '#5B8CFF', '#7A5CFA',
+  '#14B8A6', '#10B981', '#22C55E',
+  '#F59E0B', '#D97706', '#F97316',
+  '#EC4899', '#DB2777', '#64748B',
+  '#94A3B8', '#1E293B', '#8B5CF6',
+  '#0EA5E9', '#06B6D4', '#475569'
 ]
 
 export default function ProjectForm({ visible, project, onClose, onSubmit }) {
@@ -44,18 +46,26 @@ export default function ProjectForm({ visible, project, onClose, onSubmit }) {
 
   return (
     <Modal
-      title={<span className="mono-label" style={{ opacity: 1, fontWeight: 700 }}>{project ? 'EDITAR PROYECTO' : 'CREAR PROYECTO'}</span>}
+      title={
+        <div>
+          <div className="app-kicker">Workspace</div>
+          <Text style={{ fontSize: 18, fontWeight: 650, color: token.colorText }}>
+            {project ? 'Editar área' : 'Crear área'}
+          </Text>
+        </div>
+      }
       open={visible}
       onCancel={onClose}
       onOk={() => form.submit()}
       confirmLoading={loading}
-      width={480}
+      width={540}
       okText={project ? 'Actualizar' : 'Crear'}
-      okButtonProps={{ style: { borderRadius: '2px' } }}
-      cancelButtonProps={{ style: { borderRadius: '2px' } }}
+      okButtonProps={{ size: 'large' }}
+      cancelButtonProps={{ size: 'large' }}
       styles={{
-        header: { borderBottom: `1px solid ${token.colorBorderSecondary}`, paddingBottom: '16px' },
-        body: { paddingTop: '24px' }
+        header: { borderBottom: `1px solid ${token.colorBorderSecondary}`, paddingBottom: 18 },
+        body: { paddingTop: 24 },
+        footer: { borderTop: `1px solid ${token.colorBorderSecondary}` },
       }}
     >
       <Form
@@ -65,34 +75,24 @@ export default function ProjectForm({ visible, project, onClose, onSubmit }) {
         autoComplete="off"
       >
         <Form.Item
-          label={<span className="mono-label">NOMBRE DEL PROYECTO</span>}
+          label={<span className="app-kicker">Nombre del área</span>}
           name="name"
           rules={[{ required: true, message: 'El nombre es requerido' }]}
         >
-          <Input 
-            variant="filled" 
-            placeholder="ej. Hoja de Ruta Q2" 
-            style={{ borderRadius: '2px', border: 'none' }}
-          />
+          <Input placeholder="ej. Hoja de Ruta Q2" size="large" />
         </Form.Item>
 
-        <Form.Item label={<span className="mono-label">DESCRIPCIÓN</span>} name="description" rules={[{ required: true, message: 'La descripción es requerida' }]}>
-          <Input.TextArea 
-            variant="filled" 
-            rows={3} 
-            placeholder="Contexto del proyecto..." 
-            style={{ borderRadius: '2px', border: 'none' }}
-          />
+        <Form.Item label={<span className="app-kicker">Descripción</span>} name="description" rules={[{ required: true, message: 'La descripción es requerida' }]}> 
+          <Input.TextArea rows={4} placeholder="Contexto del proyecto..." />
         </Form.Item>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-           <Form.Item label={<span className="mono-label">COLOR DE MARCA</span>} name="color" initialValue={colors[0]}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 20 }}>
+           <Form.Item label={<span className="app-kicker">Color de marca</span>} name="color" initialValue={colors[0]}>
             <Select
-              variant="filled"
-              style={{ borderRadius: '2px' }}
+              size="large"
               optionLabelRender={(option) => (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <div style={{ width: '20px', height: '20px', background: option.value, borderRadius: '2px', border: `2px solid ${token.colorBorder}` }} />
+                  <div style={{ width: 16, height: 16, background: option.value, borderRadius: 6, border: `1px solid ${token.colorBorder}` }} />
                   <span>{option.value}</span>
                 </div>
               )}
@@ -100,7 +100,7 @@ export default function ProjectForm({ visible, project, onClose, onSubmit }) {
               {colors.map((color) => (
                 <Select.Option key={color} value={color}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ width: '20px', height: '20px', background: color, borderRadius: '2px', border: `2px solid ${token.colorBorder}` }} />
+                    <div style={{ width: 16, height: 16, background: color, borderRadius: 6, border: `1px solid ${token.colorBorder}` }} />
                     <span>{color}</span>
                   </div>
                 </Select.Option>
@@ -108,10 +108,9 @@ export default function ProjectForm({ visible, project, onClose, onSubmit }) {
             </Select>
           </Form.Item>
 
-           <Form.Item label={<span className="mono-label">ÍCONO</span>} name="icon" initialValue={iconOptions[0].value}>
+           <Form.Item label={<span className="app-kicker">Ícono</span>} name="icon" initialValue={iconOptions[0].value}>
             <Select 
-              variant="filled" 
-              style={{ borderRadius: '2px' }}
+              size="large"
               optionLabelRender={(option) => {
                 const iconOpt = iconOptions.find(opt => opt.value === option.value)
                 if (iconOpt) {

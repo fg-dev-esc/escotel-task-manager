@@ -7,18 +7,20 @@ import {
 } from '@ant-design/icons'
 
 const statusConfig = {
-  todo: { color: 'default', label: 'POR HACER', icon: <FileTextOutlined style={{ fontSize: '12px' }} /> },
+  todo: { color: '#64748B', bg: 'rgba(100, 116, 139, 0.10)', label: 'Por hacer', icon: <FileTextOutlined style={{ fontSize: '12px' }} /> },
   in_progress: {
-    color: 'processing',
-    label: 'EN CURSO',
+    color: '#2F6BFF',
+    bg: 'rgba(47, 107, 255, 0.10)',
+    label: 'En curso',
     icon: <ClockCircleOutlined style={{ fontSize: '12px' }} />,
   },
   in_review: {
-    color: 'warning',
-    label: 'REVISIÓN',
+    color: '#D97706',
+    bg: 'rgba(217, 119, 6, 0.10)',
+    label: 'En revisión',
     icon: <SyncOutlined style={{ fontSize: '12px' }} />,
   },
-  done: { color: 'success', label: 'COMPLETADO', icon: <CheckCircleOutlined style={{ fontSize: '12px' }} /> },
+  done: { color: '#16A34A', bg: 'rgba(22, 163, 74, 0.10)', label: 'Completado', icon: <CheckCircleOutlined style={{ fontSize: '12px' }} /> },
 }
 
 export default function StatusBadge({ status }) {
@@ -30,16 +32,19 @@ export default function StatusBadge({ status }) {
       icon={config.icon}
       bordered={false}
       style={{
-        background: token.colorBorderSecondary,
-        color: token.colorTextSecondary,
-        borderRadius: '2px',
+        background: config.bg,
+        color: config.color,
+        borderRadius: '999px',
         fontSize: '10px',
-        fontWeight: 600,
-        padding: '0 8px',
+        fontWeight: 650,
+        padding: '5px 10px',
         display: 'inline-flex',
         alignItems: 'center',
         gap: '4px',
-        fontFamily: "'JetBrains Mono', monospace"
+        fontFamily: 'var(--font-mono)',
+        letterSpacing: '0.08em',
+        textTransform: 'uppercase',
+        border: '1px solid transparent',
       }}
     >
       {config.label}

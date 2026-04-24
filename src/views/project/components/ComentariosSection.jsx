@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   Button,
   Input,
@@ -8,15 +8,20 @@ import {
   Modal,
   message,
   Spin,
-  Empty
+  Empty,
+  Card,
+  Typography,
+  Divider
 } from 'antd'
-import { DeleteOutlined, EditOutlined, PictureOutlined, CheckOutlined, CloseOutlined } from '@ant-design/icons'
+import { DeleteOutlined, EditOutlined, PictureOutlined, CheckOutlined, CloseOutlined, PlusOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import 'dayjs/locale/es'
 
 dayjs.extend(relativeTime)
 dayjs.locale('es')
+
+const { Text } = Typography
 
 /**
  * Sección de comentarios con historial
@@ -31,36 +36,43 @@ export default function ComentariosSection({
   autor
 }) {
   const [editandoId, setEditandoId] = useState(null)
+  const totalAdjuntos = useMemo(() => comentarios.reduce((acc, comentario) => acc + (comentario.fotos?.length || 0), 0), [comentarios])
 
   return (
-    <div
-      style={{
-        border: '1px solid #d9d9d9',
-        borderRadius: '6px',
-        padding: '12px',
-        marginBottom: '16px'
-      }}
-    >
-      {/* HEADER CON BADGE */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-        <h4 style={{ margin: 0 }}>
-          Comentarios
-          <Badge count={comentarios.length} style={{ marginLeft: '8px', backgroundColor: '#1890ff' }} />
-        </h4>
+    <Card className="app-panel" style={{ marginBottom: 16 }} bodyStyle={{ padding: 20 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, marginBottom: 16 }}>
+        <div>
+          <div className="app-kicker">Discussion</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4 }}>
+            <Text style={{ fontSize: 18, fontWeight: 650, letterSpacing: '-0.03em' }}>Comentarios</Text>
+            <Badge count={comentarios.length} showZero style={{ backgroundColor: 'var(--app-primary)' }} />
+          </div>
+          <Text type="secondary" style={{ display: 'block', marginTop: 6 }}>
+            Historial colaborativo
+          </Text>
+        </div>
       </div>
 
-      {/* LISTADO - SCROLLEABLE */}
+      <Divider style={{ margin: '0 0 16px' }} />
+
       <Spin spinning={loading}>
         <div
           style={{
-            maxHeight: '300px',
+            maxHeight: '360px',
             overflowY: 'auto',
-            marginBottom: '12px',
-            paddingRight: '8px'
+            marginBottom: 16,
+            paddingRight: 6,
           }}
         >
           {comentarios.length === 0 ? (
-            <Empty description="Sin comentarios" style={{ marginTop: '12px' }} />
+            <Empty
+              description={
+                <div>
+                  <div style={{ fontWeight: 650, marginBottom: 4 }}>Sin comentarios</div>
+                  <Text type="secondary">Todo el contexto de la tarea vive aquí.</Text>
+                </div>
+              }
+            />
           ) : (
             comentarios.map(comentario =>
               editandoId === comentario.id ? (
@@ -96,11 +108,12 @@ export default function ComentariosSection({
         </div>
       </Spin>
 
-      {/* FORM - NUEVO COMENTARIO */}
+      <Divider style={{ margin: '0 0 16px' }} />
+
       {editandoId === null && (
         <FormAgregarComentario tareaId={tareaId} onAgregar={onAgregar} loading={loading} autor={autor} />
       )}
-    </div>
+    </Card>
   )
 }
 
@@ -108,75 +121,57 @@ function ComentarioItem({ comentario, onEditar, onEliminar }) {
   return (
     <div
       style={{
-        borderBottom: '1px solid #e8e8e8',
-        paddingBottom: '12px',
-        marginBottom: '12px',
-        padding: '8px',
-        borderRadius: '4px'
+        padding: 14,
+        border: '1px solid var(--app-border)',
+        borderRadius: 16,
+        background: 'rgba(255,255,255,0.82)',
+        marginBottom: 12,
       }}
     >
-      {/* HEADER: Fecha y botones */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-          <small style={{ color: '#666', fontSize: '12px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+        <div style={{ minWidth: 0 }}>
+          <Text type="secondary" style={{ fontSize: 12, display: 'block' }}>
             {dayjs(comentario.createdAt).fromNow()}
-            {comentario.updatedAt !== comentario.createdAt && (
-              <span style={{ marginLeft: '8px', color: '#999' }}>(editado)</span>
-            )}
-          </small>
+            {comentario.updatedAt !== comentario.createdAt && <span style={{ marginLeft: 8 }}>(editado)</span>}
+          </Text>
           {comentario.autor && (
-            <small style={{ color: '#999', fontSize: '12px', marginLeft: '8px' }}>
+            <Text style={{ fontSize: 12, fontWeight: 600, display: 'block', marginTop: 2 }}>
               {comentario.autor}
-            </small>
+            </Text>
           )}
-          <Space size="small">
-          <Button
-            type="text"
-            size="small"
-            icon={<EditOutlined />}
-            onClick={onEditar}
-            title="Editar"
-          />
-          <Button
-            type="text"
-            danger
-            size="small"
-            icon={<DeleteOutlined />}
-            onClick={onEliminar}
-            title="Eliminar"
-          />
+        </div>
+        <Space size="small">
+          <Button type="text" size="small" icon={<EditOutlined />} onClick={onEditar} title="Editar" />
+          <Button type="text" danger size="small" icon={<DeleteOutlined />} onClick={onEliminar} title="Eliminar" />
         </Space>
       </div>
 
-      {/* TEXTO */}
-      <p style={{ margin: '8px 0', wordBreak: 'break-word' }}>{comentario.texto}</p>
+      <Text style={{ display: 'block', margin: '8px 0 12px', wordBreak: 'break-word', lineHeight: 1.65 }}>
+        {comentario.texto}
+      </Text>
 
-      {/* GALERÍA DE FOTOS */}
       {comentario.fotos && comentario.fotos.length > 0 && (
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '8px' }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           {comentario.fotos.map(foto => (
             <div
               key={foto.id}
               style={{
                 position: 'relative',
                 cursor: 'pointer',
-                borderRadius: '4px',
-                overflow: 'hidden'
+                borderRadius: 12,
+                overflow: 'hidden',
+                border: '1px solid var(--app-border)',
+                width: 84,
+                height: 84,
+                background: '#fff'
               }}
               title={foto.nombre}
+              onClick={() => window.open(foto.url, '_blank')}
             >
               <img
                 src={foto.url}
                 alt={foto.nombre}
-                style={{
-                  width: '80px',
-                  height: '80px',
-                  objectFit: 'cover',
-                  borderRadius: '4px',
-                  border: '1px solid #ddd'
-                }}
-                onClick={() => {
-                  window.open(foto.url, '_blank')
-                }}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </div>
           ))}
@@ -212,54 +207,41 @@ function FormAgregarComentario({ tareaId, onAgregar, loading, autor }) {
   }
 
   return (
-    <div style={{ borderTop: '1px solid #e8e8e8', paddingTop: '12px' }}>
+    <div>
       <Input.TextArea
         rows={2}
         placeholder="Escribe un comentario..."
         value={texto}
         onChange={e => setTexto(e.target.value)}
         disabled={loading}
-        style={{ marginBottom: '8px' }}
+        style={{ marginBottom: 10 }}
       />
 
-      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
-        <Upload
-          multiple
-          maxCount={5}
-          beforeUpload={() => false}
-          onChange={info => setFotos(info.fileList)}
-          accept="image/*"
-        >
-          {/* <Button
-            icon={<PictureOutlined />}
-            disabled={loading}
+<div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, flexWrap: 'wrap', marginBottom: 10 }}>
+        <div style={{ marginLeft: 'auto' }}>
+          <Button
+            type="primary"
+            onClick={handleSubmit}
+            loading={loading}
+            disabled={!texto.trim()}
           >
-            Fotos ({fotos.length}/5)
-          </Button> */}
-        </Upload>
-
-        <Button
-          type="primary"
-          onClick={handleSubmit}
-          loading={loading}
-          disabled={!texto.trim()}
-        >
-          Enviar
-        </Button>
+            Enviar
+          </Button>
+        </div>
       </div>
 
       {/* Preview de fotos seleccionadas */}
       {fotos.length > 0 && (
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '8px' }}>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
           {fotos.map(file => (
             <div
               key={file.uid}
               style={{
-                width: '60px',
-                height: '60px',
-                borderRadius: '4px',
+                width: 64,
+                height: 64,
+                borderRadius: 12,
                 overflow: 'hidden',
-                border: '1px solid #ddd'
+                border: '1px solid var(--app-border)'
               }}
             >
               <img
@@ -306,10 +288,11 @@ function FormEditarComentario({ comentario, loading, onGuardar, onCancelar }) {
   return (
     <div
       style={{
-        border: '1px solid #d9d9d9',
-        padding: '12px',
-        borderRadius: '4px',
-        marginBottom: '12px'
+        border: '1px solid var(--app-border)',
+        padding: 14,
+        borderRadius: 16,
+        marginBottom: 12,
+        background: 'rgba(248,250,252,0.8)'
       }}
     >
       <Input.TextArea
@@ -317,24 +300,24 @@ function FormEditarComentario({ comentario, loading, onGuardar, onCancelar }) {
         value={texto}
         onChange={e => setTexto(e.target.value)}
         disabled={loading}
-        style={{ marginBottom: '8px' }}
+        style={{ marginBottom: 10 }}
       />
 
       {/* Fotos existentes */}
       {fotosRestantes.length > 0 && (
-        <div style={{ marginBottom: '8px' }}>
-          <small style={{ display: 'block', marginBottom: '4px', color: '#666' }}>Fotos actuales:</small>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+        <div style={{ marginBottom: 10 }}>
+          <Text type="secondary" style={{ display: 'block', marginBottom: 6, fontSize: 12 }}>Fotos actuales</Text>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             {fotosRestantes.map(foto => (
               <div
                 key={foto.id}
                 style={{
                   position: 'relative',
-                  width: '60px',
-                  height: '60px',
-                  borderRadius: '4px',
+                  width: 64,
+                  height: 64,
+                  borderRadius: 12,
                   overflow: 'hidden',
-                  border: '1px solid #ddd'
+                  border: '1px solid var(--app-border)'
                 }}
               >
                 <img
@@ -357,7 +340,7 @@ function FormEditarComentario({ comentario, loading, onGuardar, onCancelar }) {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                    backgroundColor: 'rgba(15, 23, 42, 0.55)',
                     opacity: 0,
                     transition: 'opacity 0.3s'
                   }}
@@ -375,7 +358,7 @@ function FormEditarComentario({ comentario, loading, onGuardar, onCancelar }) {
       )}
 
       {/* Agregar nuevas fotos */}
-      <div style={{ marginBottom: '8px' }}>
+      <div style={{ marginBottom: 10 }}>
         <Upload
           multiple
           maxCount={5 - fotosRestantes.length}
@@ -383,7 +366,7 @@ function FormEditarComentario({ comentario, loading, onGuardar, onCancelar }) {
           onChange={info => setFotosNuevas(info.fileList)}
           accept="image/*"
         >
-          <Button icon={<PictureOutlined />} disabled={loading}>
+          <Button icon={<PlusOutlined />} disabled={loading}>
             Agregar fotos ({fotosNuevas.length}/{5 - fotosRestantes.length})
           </Button>
         </Upload>
@@ -391,16 +374,16 @@ function FormEditarComentario({ comentario, loading, onGuardar, onCancelar }) {
 
       {/* Preview nuevas fotos */}
       {fotosNuevas.length > 0 && (
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '8px' }}>
+<div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 10, justifyContent: 'flex-end' }}>
           {fotosNuevas.map(file => (
             <div
               key={file.uid}
               style={{
-                width: '60px',
-                height: '60px',
-                borderRadius: '4px',
+                width: 64,
+                height: 64,
+                borderRadius: 12,
                 overflow: 'hidden',
-                border: '1px solid #ddd'
+                border: '1px solid var(--app-border)'
               }}
             >
               <img

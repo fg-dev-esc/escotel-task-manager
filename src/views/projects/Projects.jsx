@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Button, Row, Col, Typography, theme, Modal, message } from 'antd'
-import { FolderOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { Button, Row, Col, Typography, Modal, message, Empty, Skeleton } from 'antd'
+import { EditOutlined, DeleteOutlined, PlusOutlined, ArrowRightOutlined } from '@ant-design/icons'
 import { useNavigate } from 'react-router-dom'
 import { useAreas } from '../../hooks/useAreas.jsx'
 import { getIconComponent } from '../../utils/icons'
@@ -10,7 +10,6 @@ const { Title, Text } = Typography
 
 export default function Projects() {
   const navigate = useNavigate()
-  const { token } = theme.useToken()
   const { areas, loading, crear, actualizar, eliminar } = useAreas()
   const [formVisible, setFormVisible] = useState(false)
   const [editingArea, setEditingArea] = useState(null)
@@ -97,132 +96,122 @@ export default function Projects() {
     : null
 
   return (
-    <div style={{ padding: 24 }}>
-      <header
-        style={{
-          marginBottom: 32,
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'flex-end',
-          borderBottom: `1px solid ${token.colorBorderSecondary}`,
-          paddingBottom: 16
-        }}
-      >
+    <div className="app-page">
+      <header className="app-page-header">
         <div>
-          <Title level={1} style={{ margin: 0 }}>
+          <div className="app-kicker">Workspace</div>
+          <Title level={1} className="app-title" style={{ margin: 0 }}>
             Áreas
           </Title>
-          <Text>{areas.length} áreas</Text>
+          {/* <Text className="app-subtitle" style={{ display: 'block' }}>
+            Organiza proyectos con una vista limpia, densa y precisa. Cada tarjeta actúa como acceso directo al trabajo.
+          </Text> */}
         </div>
-        <Button type="primary" onClick={handleNuevo}>
-          Nuevo Proyecto
+
+        <Button type="primary" onClick={handleNuevo} size="large" icon={<PlusOutlined />}>
+          Nueva área
         </Button>
       </header>
 
-      {areas.length === 0 ? (
-        <div
-          style={{
-            padding: 120,
-            textAlign: 'center',
-            background: token.colorBgContainer,
-            border: `1px dashed ${token.colorBorder}`,
-            borderRadius: 4
-          }}
-        >
-          <FolderOutlined
-            style={{
-              fontSize: 48,
-              color: token.colorTextDescription,
-              marginBottom: 24
-            }}
-          />
-          <Title
-            level={3}
-            style={{ fontWeight: 400, color: token.colorTextDescription }}
+      {loading ? (
+        <div className="app-panel" style={{ padding: 24 }}>
+          <Skeleton active paragraph={{ rows: 6 }} />
+        </div>
+      ) : areas.length === 0 ? (
+        <div className="app-empty-shell" style={{ padding: '72px 24px', textAlign: 'center' }}>
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description={
+              <div>
+                <div style={{ fontWeight: 650, marginBottom: 4 }}>No hay áreas todavía</div>
+                <Text type="secondary">Crea la primera para empezar a distribuir proyectos y tareas.</Text>
+              </div>
+            }
           >
-            No hay áreas
-          </Title>
-          <Button type="primary" onClick={handleNuevo} style={{ marginTop: 16 }}>
-            Crear primera área
-          </Button>
+            <Button type="primary" onClick={handleNuevo} icon={<PlusOutlined />}>
+              Crear primera área
+            </Button>
+          </Empty>
         </div>
       ) : (
-        <Row gutter={[24, 24]}>
+        <Row gutter={[20, 20]}>
           {areas.map(area => {
             const IconComponent = getIconComponent(area.icon)
             return (
-              <Col key={area.id} xs={24} sm={12} lg={8}>
-                <div
+              <Col key={area.id} xs={24} sm={12} xl={8} xxl={6}>
+                <article
                   onClick={() => handleClick(area)}
+                  className="app-panel"
                   style={{
-                    padding: 24,
-                    background: token.colorBgContainer,
-                    border: `1px solid ${token.colorBorderSecondary}`,
-                    borderRadius: 4,
+                    padding: 20,
                     cursor: 'pointer',
-                    transition: 'all 0.3s ease',
-                    position: 'relative'
+                    minHeight: 184,
+                    position: 'relative',
+                    overflow: 'hidden',
+                    transition: 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease',
                   }}
                   onMouseEnter={e => {
+                    e.currentTarget.style.transform = 'translateY(-2px)'
+                    e.currentTarget.style.boxShadow = '0 14px 32px rgba(15, 23, 42, 0.08)'
                     e.currentTarget.style.borderColor = area.color
-                    e.currentTarget.style.boxShadow = `0 2px 8px ${area.color}20`
                   }}
                   onMouseLeave={e => {
-                    e.currentTarget.style.borderColor = token.colorBorderSecondary
-                    e.currentTarget.style.boxShadow = 'none'
+                    e.currentTarget.style.transform = 'translateY(0)'
+                    e.currentTarget.style.boxShadow = 'var(--app-shadow-sm)'
+                    e.currentTarget.style.borderColor = 'var(--app-border)'
                   }}
                 >
-                  <Button
-                    type="text"
-                    size="small"
-                    icon={<EditOutlined />}
-                    onClick={e => handleEdit(e, area)}
-                    style={{
-                      position: 'absolute',
-                      top: 8,
-                      right: 40,
-                      color: token.colorTextSecondary
-                    }}
-                  />
-                  <Button
-                    type="text"
-                    size="small"
-                    danger
-                    icon={<DeleteOutlined />}
-                    onClick={e => handleDelete(e, area)}
-                    style={{
-                      position: 'absolute',
-                      top: 8,
-                      right: 8
-                    }}
-                  />
-                  <div
-                    style={{
-                      width: 48,
-                      height: 48,
-                      background: area.color,
-                      borderRadius: 4,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginBottom: 12,
-                      fontSize: 24
-                    }}
-                  >
-                    <IconComponent style={{ color: 'white' }} />
-                  </div>
-                  <Title level={4} style={{ marginTop: 0, marginBottom: 4 }}>
-                    {area.nombre}
-                  </Title>
-                  {area.descripcion && (
-                    <Text
-                      type="secondary"
-                      style={{ fontSize: '12px' }}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, marginBottom: 18 }}>
+                    <div
+                      style={{
+                        width: 52,
+                        height: 52,
+                        borderRadius: 18,
+                        background: `linear-gradient(135deg, ${area.color}26, ${area.color}10)`,
+                        border: `1px solid ${area.color}26`,
+                        display: 'grid',
+                        placeItems: 'center',
+                        color: area.color,
+                        flexShrink: 0,
+                      }}
                     >
+                      <IconComponent style={{ fontSize: 22 }} />
+                    </div>
+
+                    <div style={{ display: 'flex', gap: 4 }}>
+                      <Button
+                        type="text"
+                        size="small"
+                        icon={<EditOutlined />}
+                        onClick={e => handleEdit(e, area)}
+                      />
+                      <Button
+                        type="text"
+                        size="small"
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={e => handleDelete(e, area)}
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+                    <Title level={4} style={{ margin: 0, fontWeight: 650, letterSpacing: '-0.03em' }}>
+                      {area.nombre}
+                    </Title>
+                    <ArrowRightOutlined style={{ color: 'var(--app-text-tertiary)', fontSize: 12 }} />
+                  </div>
+
+                  {area.descripcion ? (
+                    <Text type="secondary" style={{ display: 'block', lineHeight: 1.6 }}>
                       {area.descripcion}
                     </Text>
+                  ) : (
+                    <Text type="secondary" style={{ display: 'block', lineHeight: 1.6 }}>
+                      Sin descripción.
+                    </Text>
                   )}
-                </div>
+                </article>
               </Col>
             )
           })}

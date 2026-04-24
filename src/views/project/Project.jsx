@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Button, Typography, Segmented, Space } from 'antd'
+import { Button, Typography, Segmented, Space, Empty, Skeleton, Alert } from 'antd'
 import { ArrowLeftOutlined, PlusOutlined, AppstoreOutlined, BarsOutlined } from '@ant-design/icons'
 import TaskList from './components/TaskList'
 import TaskKanban from './components/TaskKanban'
@@ -18,7 +18,8 @@ export default function Project() {
   const {
     tareas,
     stats,
-    cargarTareas,
+    loading,
+    error,
     crearTarea,
     actualizarTarea,
     eliminarTarea
@@ -30,6 +31,7 @@ export default function Project() {
 
   const area = areas.find(a => a.id === areaId)
   const areaDisplay = area ? area.nombre : areaId
+  const areaColor = area?.color || '#2F6BFF'
 
   const handleEdit = tarea => {
     setEditandoTarea(tarea)
@@ -76,41 +78,82 @@ export default function Project() {
   }
 
   return (
-    <div style={{ padding: 24 }}>
-      <header style={{ marginBottom: 24 }}>
-        <Button
-          type="text"
-          icon={<ArrowLeftOutlined />}
-          onClick={() => navigate('/')}
-          style={{ marginBottom: 16 }}
-        />
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-          <div>
-            <Title level={1} style={{ margin: 0 }}>
-              {areaDisplay}
-            </Title>
-            <Text>
-              {stats.activas} activas • {stats.completadas} completadas
-              {stats.vencidas > 0 && ` • ${stats.vencidas} vencidas`}
-            </Text>
-          </div>
-          <Space>
-            <Segmented
-              value={viewMode}
-              onChange={setViewMode}
-              options={[
-                { value: 'lista', icon: <BarsOutlined /> },
-                { value: 'kanban', icon: <AppstoreOutlined /> }
-              ]}
-            />
-            <Button type="primary" icon={<PlusOutlined />} onClick={handleNew}>
-              Nueva Tarea
-            </Button>
-          </Space>
+    <div className="app-page">
+      <header className="app-page-header" style={{ alignItems: 'center' }}>
+        <div>
+          <Button
+            type="text"
+            icon={<ArrowLeftOutlined />}
+            onClick={() => navigate('/')}
+            style={{ marginBottom: 14 }}
+          >
+            Volver
+          </Button>
+          <div className="app-kicker">Project workspace</div>
+          <Title level={1} className="app-title" style={{ margin: 0 }}>
+            {areaDisplay}
+          </Title>
+          <Text className="app-subtitle" style={{ display: 'block' }}>
+            {stats.activas} activas · {stats.completadas} completadas{stats.vencidas > 0 ? ` · ${stats.vencidas} vencidas` : ''}
+          </Text>
         </div>
+
+        <Space size={12} wrap>
+          <Segmented
+            value={viewMode}
+            onChange={setViewMode}
+            options={[
+              { value: 'lista', icon: <BarsOutlined /> },
+              { value: 'kanban', icon: <AppstoreOutlined /> }
+            ]}
+          />
+          <Button type="primary" icon={<PlusOutlined />} onClick={handleNew} size="large">
+            Nueva tarea
+          </Button>
+        </Space>
       </header>
 
-      {viewMode === 'lista' ? (
+      <div className="app-surface-row" style={{ marginBottom: 24 }}>
+        <div className="app-stat">
+          <div className="app-stat-label">Activas</div>
+          <div className="app-stat-value">{stats.activas}</div>
+          <div className="app-stat-meta">Tareas aún en progreso.</div>
+        </div>
+        <div className="app-stat">
+          <div className="app-stat-label">Completadas</div>
+          <div className="app-stat-value">{stats.completadas}</div>
+          <div className="app-stat-meta">Trabajo finalizado y cerrado.</div>
+        </div>
+        <div className="app-stat">
+          <div className="app-stat-label">Vencidas</div>
+          <div className="app-stat-value">{stats.vencidas}</div>
+          <div className="app-stat-meta">Atención operativa requerida.</div>
+        </div>
+      </div>
+
+      {loading ? (
+        <div className="app-panel" style={{ padding: 24 }}>
+          <Skeleton active paragraph={{ rows: 8 }} />
+        </div>
+      ) : error ? (
+        <Alert type="error" showIcon message="No se pudieron cargar las tareas" description={error} />
+      ) : tareas.length === 0 ? (
+        <div className="app-empty-shell" style={{ padding: '72px 24px', textAlign: 'center' }}>
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description={
+              <div>
+                <div style={{ fontWeight: 650, marginBottom: 4 }}>No hay tareas todavía</div>
+                <Text type="secondary">Crea la primera para empezar a distribuir el trabajo.</Text>
+              </div>
+            }
+          >
+            <Button type="primary" icon={<PlusOutlined />} onClick={handleNew}>
+              Crear primera tarea
+            </Button>
+          </Empty>
+        </div>
+      ) : viewMode === 'lista' ? (
         <TaskList
           tareas={tareas}
           onEditTask={handleEdit}
@@ -122,7 +165,7 @@ export default function Project() {
           columnas={[
             { id: 'todo', label: 'POR HACER' },
             { id: 'in_progress', label: 'EN CURSO' },
-            { id: 'in_review', label: 'EN REVISION' },
+            { id: 'in_review', label: 'EN REVISIÓN' },
             { id: 'done', label: 'COMPLETADO' }
           ]}
           onMoverTarea={handleMoverTarea}
