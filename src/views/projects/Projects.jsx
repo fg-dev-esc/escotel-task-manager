@@ -37,7 +37,7 @@ export default function Projects() {
         try {
           await eliminar(area.id)
           message.success('Área eliminada')
-        } catch (error) {
+        } catch {
           message.error('Error eliminando el área')
         }
       }
@@ -57,7 +57,7 @@ export default function Projects() {
         icon: values.icon
       })
       message.success('Área creada')
-    } catch (error) {
+    } catch {
       message.error('Error creando el área')
     }
   }
@@ -71,7 +71,7 @@ export default function Projects() {
         icon: values.icon
       })
       message.success('Área actualizada')
-    } catch (error) {
+    } catch {
       message.error('Error actualizando el área')
     }
   }
@@ -103,9 +103,6 @@ export default function Projects() {
           <Title level={1} className="app-title" style={{ margin: 0 }}>
             Áreas
           </Title>
-          {/* <Text className="app-subtitle" style={{ display: 'block' }}>
-            Cada tarjeta actúa como acceso directo al trabajo.
-          </Text> */}
         </div>
 
         <Button type="primary" onClick={handleNuevo} size="large" icon={<PlusOutlined />}>

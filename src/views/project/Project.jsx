@@ -31,7 +31,6 @@ export default function Project() {
 
   const area = areas.find(a => a.id === areaId)
   const areaDisplay = area ? area.nombre : areaId
-  const areaColor = area?.color || '#2F6BFF'
 
   const handleEdit = tarea => {
     setEditandoTarea(tarea)
@@ -97,14 +96,8 @@ export default function Project() {
               {areaDisplay}
             </Title>
           )}
-{loading ? (
+          {loading && (
             <Skeleton.Input active size="small" style={{ width: 160, height: 16, marginTop: 8 }} />
-          ) : (
-            <div>{/* 
-          <Text className="app-subtitle" style={{ display: 'block' }}>
-            {stats.activas} activas · {stats.completadas} completadas{stats.vencidas > 0 ? ` · ${stats.vencidas} vencidas` : ''}
-          </Text>
-        */}</div>
           )}
         </div>
 

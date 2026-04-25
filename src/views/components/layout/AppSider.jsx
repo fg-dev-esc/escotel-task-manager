@@ -9,16 +9,6 @@ import logoEscotel from '../../../assets/logo.png'
 const { Sider } = Layout
 const { Text } = Typography
 
-function getInitials(name = '') {
-  return name
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(part => part[0])
-    .join('')
-    .toUpperCase() || 'U'
-}
-
 export default function AppSider({ collapsed, onCollapse }) {
   const navigate = useNavigate()
   const location = useLocation()

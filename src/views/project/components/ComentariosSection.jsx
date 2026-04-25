@@ -23,7 +23,6 @@ dayjs.locale('es')
 const { Text } = Typography
 
 export default function ComentariosSection({
-  tareaId,
   comentarios,
   onAgregar,
   onActualizar,

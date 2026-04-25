@@ -15,7 +15,6 @@ export default function TaskCard({ tarea, onClick, dragging = false }) {
       style={{ 
         width: '100%',
         maxWidth: '100%',
-        cursor: 'pointer',
         borderRadius: 16,
         border: `1px solid ${token.colorBorderSecondary}`,
         transition: 'transform 0.18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.18s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.18s ease',

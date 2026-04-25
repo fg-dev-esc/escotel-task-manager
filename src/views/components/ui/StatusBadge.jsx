@@ -1,4 +1,4 @@
-import { Tag, theme } from 'antd'
+import { Tag } from 'antd'
 import {
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -24,7 +24,6 @@ const statusConfig = {
 }
 
 export default function StatusBadge({ status }) {
-  const { token } = theme.useToken()
   const config = statusConfig[status] || statusConfig.todo
 
   return (

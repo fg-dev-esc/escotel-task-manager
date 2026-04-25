@@ -1,5 +1,5 @@
 import { Drawer, Form, Input, Select, DatePicker, Button, Space, Typography, Divider, theme } from 'antd'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import ComentariosSection from './ComentariosSection'
 import { useComentarios } from '../../../hooks/useComentarios'
@@ -9,10 +9,10 @@ const { Text } = Typography
 
 export default function TaskFormDrawer({ open, tarea, onClose, onSubmit }) {
   const [form] = Form.useForm()
+  const [saving, setSaving] = useState(false)
   const { token } = theme.useToken()
   const nombre = getNombre()
 
-  // Hook para comentarios
   const {
     comentarios,
     loading: loadingComentarios,
@@ -38,7 +38,6 @@ export default function TaskFormDrawer({ open, tarea, onClose, onSubmit }) {
     }
   }, [tarea, form, open])
 
-  // Cargar comentarios cuando se abre el drawer
   useEffect(() => {
     if (open && tarea?.id) {
       cargarComentarios()
@@ -46,12 +45,16 @@ export default function TaskFormDrawer({ open, tarea, onClose, onSubmit }) {
   }, [open, tarea?.id, cargarComentarios])
 
   const handleSubmit = async (values) => {
-    const data = {
-      ...values,
-      dueDate: values.dueDate ? values.dueDate.toISOString() : null,
+    setSaving(true)
+    try {
+      const data = {
+        ...values,
+        dueDate: values.dueDate ? values.dueDate.toISOString() : null,
+      }
+      await onSubmit(data)
+    } finally {
+      setSaving(false)
     }
-    await onSubmit(data)
-    onClose()
   }
 
   return (
@@ -69,8 +72,8 @@ export default function TaskFormDrawer({ open, tarea, onClose, onSubmit }) {
       destroyOnClose
       footer={
         <Space style={{ float: 'right' }}>
-          <Button onClick={onClose} size="large">Cancelar</Button>
-          <Button type="primary" onClick={() => form.submit()} size="large">
+          <Button onClick={onClose} size="large" disabled={saving}>Cancelar</Button>
+          <Button type="primary" onClick={() => form.submit()} size="large" loading={saving}>
             Guardar
           </Button>
         </Space>
