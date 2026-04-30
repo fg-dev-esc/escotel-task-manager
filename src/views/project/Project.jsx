@@ -199,7 +199,6 @@ export default function Project() {
         />
       )}
 
-      {/* Modal para CREAR */}
       {!editandoTarea && (
         <TaskForm
           visible={showForm}
@@ -209,7 +208,6 @@ export default function Project() {
         />
       )}
 
-      {/* Drawer para EDITAR */}
       {editandoTarea && (
         <TaskFormDrawer
           open={showForm}

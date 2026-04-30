@@ -11,7 +11,6 @@ export function useTaskList(areaId) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
-  // [QUERY 2] Cargar tareas cuando entra al área
   const cargarTareas = useCallback(async () => {
     if (!areaId) return
 
@@ -32,7 +31,6 @@ export function useTaskList(areaId) {
     cargarTareas()
   }, [cargarTareas])
 
-  // STATS CALCULADOS EN CLIENTE (EN MEMORIA)
   const calcularStats = useCallback(() => {
     const now = new Date()
 
@@ -49,13 +47,11 @@ export function useTaskList(areaId) {
     }
   }, [tareas])
 
-  // CREAR TAREA (LOCAL + FIRESTORE)
   const handleCrear = useCallback(
     async tarea => {
       try {
         const nuevaTarea = await crearTarea(areaId, tarea)
 
-        // Agregar a Context local
         setTareas(prev => [nuevaTarea, ...prev])
 
         return nuevaTarea
@@ -67,13 +63,11 @@ export function useTaskList(areaId) {
     [areaId]
   )
 
-  // ACTUALIZAR TAREA (LOCAL + FIRESTORE)
   const handleActualizar = useCallback(
     async (tareaId, updates) => {
       try {
         await actualizarTarea(tareaId, updates)
 
-        // Actualizar Context local (UI responde al instante)
         setTareas(prev =>
           prev.map(t =>
             t.id === tareaId
@@ -89,13 +83,11 @@ export function useTaskList(areaId) {
     []
   )
 
-  // ELIMINAR TAREA (LOCAL + FIRESTORE)
   const handleEliminar = useCallback(
     async tareaId => {
       try {
         await eliminarTarea(tareaId)
 
-        // Actualizar Context local
         setTareas(prev => prev.filter(t => t.id !== tareaId))
       } catch (err) {
         console.error('Error eliminando tarea:', err)
@@ -107,7 +99,7 @@ export function useTaskList(areaId) {
 
   return {
     tareas,
-    stats: calcularStats(), // Se recalcula cada render
+    stats: calcularStats(),
     loading,
     error,
     cargarTareas,

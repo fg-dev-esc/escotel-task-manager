@@ -10,7 +10,6 @@ import {
   where
 } from 'firebase/firestore'
 
-// OBTENER TAREAS DE UN ÁREA
 export async function obtenerTareasPorArea(areaId) {
   try {
     if (!areaId) {
@@ -37,7 +36,6 @@ export async function obtenerTareasPorArea(areaId) {
   }
 }
 
-// CREAR TAREA
 export async function crearTarea(areaId, tarea) {
   try {
     if (!areaId) {
@@ -80,7 +78,6 @@ export async function crearTarea(areaId, tarea) {
   }
 }
 
-// ACTUALIZAR TAREA
 export async function actualizarTarea(tareaId, updates) {
   try {
     if (!tareaId) {
@@ -101,7 +98,6 @@ export async function actualizarTarea(tareaId, updates) {
   }
 }
 
-// ELIMINAR TAREA
 export async function eliminarTarea(tareaId) {
   try {
     if (!tareaId) {
@@ -119,7 +115,6 @@ export async function eliminarTarea(tareaId) {
   }
 }
 
-// ELIMINAR TODAS LAS TAREAS DE UN ÁREA
 export async function eliminarTareasPorArea(areaId) {
   try {
     if (!areaId) {
